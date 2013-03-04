@@ -1,0 +1,22 @@
+/*
+ * Scilab ( http://www.scilab.org/ ) - This file is part of Scilab
+ * Copyright (C) 2012 - Scilab Enterprises - Calixte DENIZET
+ *
+ * This file must be used under the terms of the CeCILL.
+ * This source file is licensed as described in the file COPYING, which
+ * you should have received as part of this distribution.  The terms
+ * are also available at
+ * http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
+ *
+ */
+/*--------------------------------------------------------------------------*/
+#ifndef __GW_EXTERNAL_OBJECTS_H__
+#define __GW_EXTERNAL_OBJECTS_H__
+/*--------------------------------------------------------------------------*/
+#include "dynlib_external_objects_java_scilab.h"
+/*--------------------------------------------------------------------------*/
+EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int gw_external_objects_java(void);
+EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int sci_jimport(char *fname, unsigned long fname_len);
+/*--------------------------------------------------------------------------*/
+#endif /* __GW_EXTERNAL_OBJECTS_H__ */
+/*--------------------------------------------------------------------------*/
