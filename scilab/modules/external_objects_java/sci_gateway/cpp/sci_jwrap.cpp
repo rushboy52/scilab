@@ -22,12 +22,12 @@ extern "C" {
 using namespace org_scilab_modules_external_objects_java;
 using namespace org_modules_external_objects;
 
-int sci_jimport(char * fname, unsigned long fname_len)
+int sci_jwrap(char * fname, unsigned long fname_len)
 {
     try
     {
         const int envId = ScilabJavaEnvironment::start();
-        return ScilabGateway::import(fname, envId, pvApiCtx);
+        return ScilabGateway::wrap(fname, envId, pvApiCtx);
     }
     catch (std::exception & e)
     {

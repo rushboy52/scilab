@@ -74,6 +74,7 @@ int ScilabJavaEnvironment::start()
                 ScilabJavaOStream::setStdErrStream(&instance->scilabStream);*/
         instance->helper.setUseLastName(true);
         instance->helper.setNewAllowed(true);
+        instance->enabletrace("/tmp/eo_java.log");
     }
 
     return envId;
@@ -139,7 +140,7 @@ const std::string & ScilabJavaEnvironment::getEnvironmentName()
 void ScilabJavaEnvironment::getEnvironmentInfos(const ScilabStringStackAllocator & allocator)
 {
 
-    writeLog("getEnvironmentInfos", "Get informations");
+    writeLog("getEnvironmentInfos", "Get information");
 
     /*
         std::vector<char *> version = breakInLines(std::string(Py_GetVersion()));
@@ -1171,6 +1172,9 @@ void ScilabJavaEnvironment::getaccessiblefields(int id, const ScilabStringStackA
 std::string ScilabJavaEnvironment::getclassname(int id)
 {
     writeLog("getclassname", "Get the class name of object with id %d.", id);
+    JavaVM *vm = getScilabJavaVM();
+    return std::string(ScilabJavaObject::getClassName(vm, id));
+
     /*
         PyObject * obj = scope.getObject(id);
         if (!obj)

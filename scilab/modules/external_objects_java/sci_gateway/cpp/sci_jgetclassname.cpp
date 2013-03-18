@@ -22,12 +22,13 @@ extern "C" {
 using namespace org_scilab_modules_external_objects_java;
 using namespace org_modules_external_objects;
 
-int sci_jimport(char * fname, unsigned long fname_len)
+int sci_jgetclassname(char * fname, unsigned long fname_len)
 {
     try
     {
         const int envId = ScilabJavaEnvironment::start();
-        return ScilabGateway::import(fname, envId, pvApiCtx);
+        printf("envId %d\n", envId);
+        return ScilabGateway::getClassName(fname, envId, pvApiCtx);
     }
     catch (std::exception & e)
     {

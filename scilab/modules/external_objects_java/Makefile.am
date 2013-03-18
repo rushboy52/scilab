@@ -40,9 +40,11 @@ src/jni/ScilabJavaObject.cpp \
 src/jni/ScilabClassLoader.cpp
 
 #src/cpp/ScilabObjectsCPP.cpp
-# src/cpp/WrapAsDirectBuffer.cpp 
+# src/cpp/WrapAsDirectBuffer.cpp
 GATEWAY_C_SOURCES = sci_gateway/c/gw_external_objects_java.c \
-sci_gateway/cpp/sci_jimport.cpp
+sci_gateway/cpp/sci_jimport.cpp \
+sci_gateway/cpp/sci_jgetclassname.cpp \
+sci_gateway/cpp/sci_jwrap.cpp
 
 GIWS_WRAPPERS = src/jni/ScilabObjects.giws.xml
 
@@ -50,7 +52,7 @@ if GIWS
 BUILT_SOURCES=giws
 endif
 
-GATEWAY_CPP_SOURCES = 
+GATEWAY_CPP_SOURCES =
 libsciexternal_objects_java_la_CFLAGS= -I$(srcdir)/includes/ \
              -I$(top_srcdir)/libs/MALLOC/includes/ \
              -I$(top_srcdir)/modules/core/includes \

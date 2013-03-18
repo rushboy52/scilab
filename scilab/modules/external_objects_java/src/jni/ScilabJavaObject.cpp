@@ -336,6 +336,7 @@ throw GiwsException::JniCallMethodException(curEnv);
 }if (res != NULL) { 
 
 const char *tempString = curEnv->GetStringUTFChars(res, 0);
+printf("tempString %s\n", tempString);
 char * myStringBuffer = new char[strlen(tempString) + 1];
 strcpy(myStringBuffer, tempString);
 curEnv->ReleaseStringUTFChars(res, tempString);

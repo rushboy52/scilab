@@ -19,7 +19,9 @@
 /*--------------------------------------------------------------------------*/
 static gw_generic_table Tab[] =
 {
-    {sci_jimport, "jimport"}
+    {sci_jimport, "jimport"},
+    {sci_jgetclassname, "jgetclassname"},
+    {sci_jwrap, "jwrap"}
 };
 
 /*--------------------------------------------------------------------------*/

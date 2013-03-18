@@ -134,7 +134,9 @@ public class ScilabJavaObject {
      * @return the string to represent this object
      */
     public static String getRepresentation(final int id) {
+        System.out.println("Dedans getRepresentation / id "+id + " arraySJO " +arraySJO.length);
         if (arraySJO[id] != null) {
+            System.out.println("foo = " + arraySJO[id]);
             return arraySJO[id].toString();
         }
 
@@ -219,7 +221,9 @@ public class ScilabJavaObject {
      * @return the class name of the object represented by id
      */
     public static String getClassName(final int id) throws ScilabJavaException {
+        System.out.println("Dedans getClassName / id "+id);
         if (id > 0) {
+            System.out.println("arraySJO[id] = "+arraySJO[id]);
             if (arraySJO[id] == null) {
                 throw new ScilabJavaException("Invalid Java object");
             }
