@@ -15,6 +15,7 @@
 #include "ScilabJavaEnvironment.hxx"
 #include "JavaOptionsHelper.hxx"
 #include "ScilabClassLoader.hxx"
+#include "ScilabJavaObject.hxx"
 
 extern "C" {
 #include "getScilabJavaVM.h"
@@ -488,7 +489,7 @@ int ScilabJavaEnvironment::createarray(char * className, int * dims, int len)
 int ScilabJavaEnvironment::loadclass(char * className, char * currentSciPath, bool isNamedVarCreated, bool allowReload)
 {
     writeLog("loadclass", "Load the module %s and allowReload is set to %s", className, allowReload ? "true" : "false");
-    JavaVM *vm = getScilabJavaVM ();
+    JavaVM *vm = getScilabJavaVM();
     ScilabClassLoader::loadJavaClass(vm, className, TRUE);
     /*
         std::string _className(className);
@@ -610,36 +611,16 @@ int ScilabJavaEnvironment::loadclass(char * className, char * currentSciPath, bo
 void ScilabJavaEnvironment::getrepresentation(int id, const ScilabStringStackAllocator & allocator)
 {
     writeLog("getrepresentation", "Get the representation of object %d.", id);
-    /*
-        PyObject * obj = scope.getObject(id);
-        if (!obj)
-        {
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid object with id %d"), id);
-        }
-
-        PyObject * repr = PyObject_Repr(obj);
-        char * str = PyString_AsString(repr);
-        allocator.allocate(1, 1, &str);
-        Py_DECREF(repr);
-    */
+    JavaVM *vm = getScilabJavaVM();
+    char *str = ScilabJavaObject::getRepresentation(vm, id);
+    allocator.allocate(1, 1, &str);
 }
 
 std::string ScilabJavaEnvironment::getrepresentation(int id)
 {
     writeLog("getrepresentation", "Get the representation of object %d.", id);
-    /*
-        PyObject * obj = scope.getObject(id);
-        if (!obj)
-        {
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid object with id %d"), id);
-        }
-
-        PyObject * repr = PyObject_Repr(obj);
-        std::string str = std::string(PyString_AsString(repr));
-        Py_DECREF(repr);
-
-        return str;*/
-    return 0;
+    JavaVM *vm = getScilabJavaVM();
+    return std::string(ScilabJavaObject::getRepresentation(vm, id));
 }
 
 bool ScilabJavaEnvironment::isvalidobject(int id)
