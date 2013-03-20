@@ -12,6 +12,11 @@
  */
 
 #include "ScilabJavaEnvironmentWrapper.hxx"
+#include "ScilabJavaObject.hxx"
+
+extern "C" {
+#include "getScilabJavaVM.h"
+}
 
 namespace org_scilab_modules_external_objects_java
 {
@@ -350,6 +355,8 @@ int ScilabJavaEnvironmentWrapper::wrap(unsigned long long * x, int xSize, int xS
 
 int ScilabJavaEnvironmentWrapper::wrap(char ** x, const bool isRef) const
 {
+    JavaVM *vm = getScilabJavaVM ();
+    return ScilabJavaObject::wrapString(vm, (char const*)x);
     /*    if (helper.getWrapSingleWithNumpy())
         {
             return wrapData(x, 1, isRef);
