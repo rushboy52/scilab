@@ -16,7 +16,7 @@
 #include "JavaOptionsHelper.hxx"
 #include "ScilabClassLoader.hxx"
 #include "ScilabJavaObject.hxx"
-
+#include "ScilabJavaObjectBis.hxx"
 extern "C" {
 #include "getScilabJavaVM.h"
 }
@@ -64,8 +64,6 @@ int ScilabJavaEnvironment::start()
 
     if (envId == -1)
     {
-        printf("Init en cours\n");
-        fflush(NULL);
         instance = new ScilabJavaEnvironment();
         envId = ScilabEnvironments::registerScilabEnvironment(instance);
         instance->Initialize();
@@ -1160,7 +1158,12 @@ void ScilabJavaEnvironment::autoremoveobject(int id)
 void ScilabJavaEnvironment::getaccessiblemethods(int id, const ScilabStringStackAllocator & allocator)
 {
     writeLog("getaccessiblemethods", "Get accessible methods on object with id %d.", id);
-    getAccessibleFields(id, allocator, false);
+    JavaVM *vm = getScilabJavaVM();
+    int pos;
+
+    ScilabJavaObjectBis::getMethodResult(vm, "getAccessibleMethods", id, pos);
+    printf("id %s\n",id);
+//    getAccessibleFields(id, allocator, false);
 }
 
 void ScilabJavaEnvironment::getaccessiblefields(int id, const ScilabStringStackAllocator & allocator)

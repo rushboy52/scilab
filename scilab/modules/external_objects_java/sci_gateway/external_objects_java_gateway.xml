@@ -32,4 +32,5 @@
     <PRIMITIVE gatewayId="72" primitiveId="1" primitiveName="jimport" />
     <PRIMITIVE gatewayId="72" primitiveId="2" primitiveName="jgetclassname" />
     <PRIMITIVE gatewayId="72" primitiveId="3" primitiveName="jwrap" />
+    <PRIMITIVE gatewayId="72" primitiveId="4" primitiveName="jgetmethods" />
 </GATEWAY>

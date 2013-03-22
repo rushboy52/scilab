@@ -44,7 +44,8 @@ src/jni/ScilabClassLoader.cpp
 GATEWAY_C_SOURCES = sci_gateway/c/gw_external_objects_java.c \
 sci_gateway/cpp/sci_jimport.cpp \
 sci_gateway/cpp/sci_jgetclassname.cpp \
-sci_gateway/cpp/sci_jwrap.cpp
+sci_gateway/cpp/sci_jwrap.cpp \
+sci_gateway/cpp/sci_jgetmethods.cpp
 
 GIWS_WRAPPERS = src/jni/ScilabObjects.giws.xml
 

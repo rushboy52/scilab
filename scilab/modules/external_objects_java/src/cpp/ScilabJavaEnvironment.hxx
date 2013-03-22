@@ -236,6 +236,7 @@ private:
 
     inline void getAccessibleFields(int id, const ScilabStringStackAllocator & allocator, const bool isField)
     {
+
         /*
                 PyObject * obj = scope.getObject(id);
                 if (!obj)

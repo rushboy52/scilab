@@ -36,7 +36,7 @@ public :
 
     JavaOptionsHelper () : OptionsHelper(), useNumpy(false), showPrivate(false), attachModule(false), wrapSingleWithNumpy(false)
     {
-        printf("boujou=%d\n", getUseLastName());
+
     }
 
     ~JavaOptionsHelper() { }
