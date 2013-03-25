@@ -27,7 +27,8 @@ static gw_generic_table Tab[] =
     {sci_jgetfield, "jgetfield"},
     {sci_jcompile, "jcompile"},
     {sci_jnewInstance, "jnewInstance"},
-    {sci_jremove, "jremove"}
+    {sci_jremove, "jremove"},
+    {sci_jexists, "jexists"}
 };
 
 /*--------------------------------------------------------------------------*/
