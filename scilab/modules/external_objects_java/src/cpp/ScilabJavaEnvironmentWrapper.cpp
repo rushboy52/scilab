@@ -192,9 +192,18 @@ VariableType ScilabJavaEnvironmentWrapper::isunwrappable(int id) const
     return Nothing;
 }
 
+// template <class T>
+// int ScilabJavaEnvironmentWrapper::wrap(T* x, const bool isRef) const
+// {
+//     JavaVM *vm = getScilabJavaVM ();
+//     return ScilabJavaObject::wrapDouble(vm, x, isRef);
+// }
+
+
 int ScilabJavaEnvironmentWrapper::wrap(double * x, const bool isRef) const
 {
-    //    return wrapData<double>(x, isRef);
+    JavaVM *vm = getScilabJavaVM ();
+    return ScilabJavaObject::wrapDouble(vm, x, isRef);
 }
 
 int ScilabJavaEnvironmentWrapper::wrap(double * x, int xSize, const bool isRef) const
