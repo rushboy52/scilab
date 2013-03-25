@@ -27,14 +27,12 @@ namespace org_scilab_modules_external_objects_java
 
 class JavaOptionsHelper : public OptionsHelper
 {
-    bool useNumpy;
     bool showPrivate;
     bool attachModule;
-    bool wrapSingleWithNumpy;
 
 public :
 
-    JavaOptionsHelper () : OptionsHelper(), useNumpy(false), showPrivate(false), attachModule(false), wrapSingleWithNumpy(false)
+    JavaOptionsHelper () : OptionsHelper(), showPrivate(false), attachModule(false)
     {
 
     }

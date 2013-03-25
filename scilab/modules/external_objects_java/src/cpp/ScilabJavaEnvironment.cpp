@@ -492,122 +492,7 @@ int ScilabJavaEnvironment::loadclass(char * className, char * currentSciPath, bo
 {
     writeLog("loadclass", "Load the module %s and allowReload is set to %s", className, allowReload ? "true" : "false");
     JavaVM *vm = getScilabJavaVM();
-    ScilabClassLoader::loadJavaClass(vm, className, TRUE);
-    /*
-        std::string _className(className);
-        std::string base(_className);
-        bool changed = false;
-        PyObject * syspath = 0;
-
-        if (isNamedVarCreated)
-        {
-            std::size_t pos = _className.find_first_of('.');
-            if (pos != std::string::npos)
-            {
-                base = _className.substr(0, pos);
-                changed = true;
-            }
-        }
-
-        PyObject * modules = PyImport_GetModuleDict();
-        if (!modules)
-        {
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Unable to get modules."));
-        }
-
-        PyObject * _name = PyUnicode_FromString(className);
-        PyObject * _module = PyDict_GetItem(modules, _name);
-        PyObject * _smodule = _module;
-
-        if (currentSciPath)
-        {
-            syspath = PySys_GetObject(const_cast<char *>("path"));
-            PyObject * _path = PyString_FromString(currentSciPath);
-            PyList_Append(syspath, _path);
-        }
-
-        if (_module)
-        {
-            if (allowReload)
-            {
-                _module = PyImport_ReloadModule(_module);
-
-                if (!_module)
-                {
-                    if (syspath)
-                    {
-                        int n = PyList_GET_SIZE(syspath);
-                        PyList_SetSlice(syspath, n - 1, n, 0);
-                    }
-
-                    if (PyErr_Occurred())
-                    {
-                        PyObject *type, *value, *traceback;
-                        PyErr_Fetch(&type, &value, &traceback);
-                        PyErr_NormalizeException(&type, &value, &traceback);
-                        PyErr_Clear();
-
-                        throw ScilabJavaException(__LINE__, __FILE__, type, value, traceback, gettext("Cannot load the module %s"), className);
-                    }
-                    throw ScilabJavaException(__LINE__, __FILE__, gettext("Cannot load the module %s"), className);
-                }
-            }
-
-    	if (_smodule == _module)
-    	{
-    	    Py_INCREF(_module);
-    	}
-        }
-        else
-        {
-            _module = PyImport_ImportModuleNoBlock(className);
-
-            if (!_module)
-            {
-                if (syspath)
-                {
-                    int n = PyList_GET_SIZE(syspath);
-                    PyList_SetSlice(syspath, n - 1, n, 0);
-                }
-
-                if (PyErr_Occurred())
-                {
-                    PyObject *type, *value, *traceback;
-                    PyErr_Fetch(&type, &value, &traceback);
-                    PyErr_NormalizeException(&type, &value, &traceback);
-                    PyErr_Clear();
-
-                    throw ScilabJavaException(__LINE__, __FILE__, type, value, traceback, gettext("Cannot load the module %s"), className);
-                }
-                throw ScilabJavaException(__LINE__, __FILE__, gettext("Cannot load the module %s"), className);
-            }
-        }
-
-        PyObject * baseModule = _module;
-        if (changed)
-        {
-            baseModule = PyImport_AddModule(base.c_str());
-        }
-
-        // We put the name in Java space
-        if (helper.getAttachModule())
-        {
-            PyObject * _main_ = PyImport_AddModule("__main__");
-            PyObject_SetAttrString(_main_, base.c_str(), baseModule);
-        }
-
-        if (syspath)
-        {
-            int n = PyList_GET_SIZE(syspath);
-            PyList_SetSlice(syspath, n - 1, n, 0);
-        }
-
-        int id = scope.addObject(baseModule);
-        writeLog("loadclass", "returned id %d.", id);
-
-        return id;
-    */
-    return 0;
+    return ScilabClassLoader::loadJavaClass(vm, className, TRUE);
 }
 
 void ScilabJavaEnvironment::getrepresentation(int id, const ScilabStringStackAllocator & allocator)
@@ -724,87 +609,91 @@ int * ScilabJavaEnvironment::invoke(int id, const char * methodName, int * args,
         writeLog("invoke", "Invoke the method %s on object %d with arguments: %s.", methodName, id, os.str().c_str());
     }
 
-    if (*methodName == '\0')
-    {
-        throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid method name"));
-    }
-
-    if (!helper.getShowPrivate() && *methodName == '_')
-    {
-        throw ScilabJavaException(__LINE__, __FILE__, gettext("Private method: %s"), methodName);
-    }
+    JavaVM *vm = getScilabJavaVM();
+    int ret = ScilabJavaObject::invoke(vm, id, methodName, args, argsSize);
+    return 0;
     /*
-        PyObject * obj = scope.getObject(id);
-        if (!obj)
+        if (*methodName == '\0')
         {
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid object with id %d"), id);
+            throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid method name"));
         }
 
-        if (!PyObject_HasAttrString(obj, methodName))
+        if (!helper.getShowPrivate() && *methodName == '_')
         {
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid method name: %s"), methodName);
+            throw ScilabJavaException(__LINE__, __FILE__, gettext("Private method: %s"), methodName);
         }
 
-        PyObject * method = PyObject_GetAttrString(obj, methodName);
-        if (!method)
-        {
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid method name: %s"), methodName);
-        }
-
-        if (!PyCallable_Check(method))
-        {
-            Py_DECREF(method);
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid method name: %s"), methodName);
-        }
-
-        PyObject * pArgs = PyTuple_New(argsSize);
-        for (int i = 0; i < argsSize; i++)
-        {
-            PyObject * obj = scope.getObject(args[i]);
+            PyObject * obj = scope.getObject(id);
             if (!obj)
             {
-                Py_DECREF(pArgs);
-                Py_DECREF(method);
                 throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid object with id %d"), id);
             }
-            Py_INCREF(obj);
-            PyTuple_SetItem(pArgs, i, obj);
-        }
 
-        PyObject * result = PyObject_Call(method, pArgs, 0);
-        Py_DECREF(pArgs);
-        Py_DECREF(method);
-
-        if (!result)
-        {
-            if (PyErr_Occurred())
+            if (!PyObject_HasAttrString(obj, methodName))
             {
-                PyObject * type, * value, * traceback;
-                PyErr_Fetch(&type, &value, &traceback);
-                PyErr_NormalizeException(&type, &value, &traceback);
-                PyErr_Clear();
-
-                throw ScilabJavaException(__LINE__, __FILE__, type, value, traceback, gettext("Unable to invoke the method: %s"), methodName);
+                throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid method name: %s"), methodName);
             }
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Unable to invoke the method: %s"), methodName);
-        }
 
-        int * ret = new int[2];
-        *ret = 1;
+            PyObject * method = PyObject_GetAttrString(obj, methodName);
+            if (!method)
+            {
+                throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid method name: %s"), methodName);
+            }
 
-        if (result == Py_None)
-        {
-            ret[1] = VOID_OBJECT;
-            writeLog("invoke", "The method returned void.");
+            if (!PyCallable_Check(method))
+            {
+                Py_DECREF(method);
+                throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid method name: %s"), methodName);
+            }
+
+            PyObject * pArgs = PyTuple_New(argsSize);
+            for (int i = 0; i < argsSize; i++)
+            {
+                PyObject * obj = scope.getObject(args[i]);
+                if (!obj)
+                {
+                    Py_DECREF(pArgs);
+                    Py_DECREF(method);
+                    throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid object with id %d"), id);
+                }
+                Py_INCREF(obj);
+                PyTuple_SetItem(pArgs, i, obj);
+            }
+
+            PyObject * result = PyObject_Call(method, pArgs, 0);
+            Py_DECREF(pArgs);
+            Py_DECREF(method);
+
+            if (!result)
+            {
+                if (PyErr_Occurred())
+                {
+                    PyObject * type, * value, * traceback;
+                    PyErr_Fetch(&type, &value, &traceback);
+                    PyErr_NormalizeException(&type, &value, &traceback);
+                    PyErr_Clear();
+
+                    throw ScilabJavaException(__LINE__, __FILE__, type, value, traceback, gettext("Unable to invoke the method: %s"), methodName);
+                }
+                throw ScilabJavaException(__LINE__, __FILE__, gettext("Unable to invoke the method: %s"), methodName);
+            }
+
+            int * ret = new int[2];
+            *ret = 1;
+
+            if (result == Py_None)
+            {
+                ret[1] = VOID_OBJECT;
+                writeLog("invoke", "The method returned void.");
+
+                return ret;
+            }
+
+            ret[1] = scope.addObject(result);
+            writeLog("invoke", "returned id %d.", ret[1]);
 
             return ret;
-        }
-
-        ret[1] = scope.addObject(result);
-        writeLog("invoke", "returned id %d.", ret[1]);
-
-        return ret;
-    */
+        */
     return 0;
 }
 
