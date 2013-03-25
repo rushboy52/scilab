@@ -17,6 +17,7 @@
 #include "ScilabClassLoader.hxx"
 #include "ScilabJavaClass.hxx"
 #include "ScilabJavaObject.hxx"
+#include "ScilabJavaCompiler.hxx"
 #include "NoMoreScilabMemoryException.hxx"
 
 //#include "ScilabJavaObjectHelper.hxx"
@@ -1117,25 +1118,9 @@ int ScilabJavaEnvironment::compilecode(char * className, char ** code, int size)
         os << code[i] << std::endl;
     }
     os.flush();
-    /*
-        PyObject * obj = Py_CompileString(os.str().c_str(), className, 0);
-        if (!obj)
-        {
-            if (PyErr_Occurred())
-            {
-                PyObject * type, * value, * traceback;
-                PyErr_Fetch(&type, &value, &traceback);
-                PyErr_NormalizeException(&type, &value, &traceback);
-                PyErr_Clear();
 
-                throw ScilabJavaException(__LINE__, __FILE__, type, value, traceback, gettext("Unable to compile the given code"));
-            }
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Unable to compile the given code"));
-        }
-
-        return scope.addObject(obj);
-    */
-    return 0;
+    JavaVM *vm = getScilabJavaVM();
+    return ScilabJavaCompiler::compileCode(vm, className, code, size);
 }
 
 void ScilabJavaEnvironment::enabletrace(const char * filename)
