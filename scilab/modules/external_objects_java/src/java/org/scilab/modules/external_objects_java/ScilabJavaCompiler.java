@@ -40,6 +40,7 @@ import javax.tools.JavaFileObject.Kind;
  * Try to find the compiler provide with JDK and if it is not found, use the Eclipse Compiler for Java
  * @author Calixte DENIZET
  */
+@SuppressWarnings("serial")
 public class ScilabJavaCompiler {
 
     private static final String JAVACOMPILER = "javax.tools.JavaCompiler";

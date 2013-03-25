@@ -23,6 +23,7 @@ import java.util.logging.Level;
  *
  * @author Calixte DENIZET
  */
+@SuppressWarnings("serial")
 public class ScilabJavaArray {
 
     private static final Map<Class, Class> mappings = new HashMap<Class, Class>();

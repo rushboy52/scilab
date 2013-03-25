@@ -25,6 +25,7 @@ import java.util.logging.Level;
  *
  * @author Calixte DENIZET
  */
+@SuppressWarnings("serial")
 public class ScilabClassLoader {
 
     protected static Map<String, Integer> clazz = new HashMap<String, Integer>();

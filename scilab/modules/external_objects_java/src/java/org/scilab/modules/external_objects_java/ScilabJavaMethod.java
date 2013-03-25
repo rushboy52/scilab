@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
  *
  * @author Calixte DENIZET
  */
+@SuppressWarnings("serial")
 public class ScilabJavaMethod {
 
     protected Class<?> clazz;

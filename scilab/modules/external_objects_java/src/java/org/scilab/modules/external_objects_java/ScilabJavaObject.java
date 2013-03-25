@@ -36,6 +36,7 @@ import java.util.logging.SimpleFormatter;
  * Main class to communicate with Scilab via jni interface generated with Giws.
  * @autor Calixte DENIZET
  */
+@SuppressWarnings("serial")
 public class ScilabJavaObject {
 
     private static final int INITIALCAPACITY = 1024;
