@@ -49,7 +49,8 @@ sci_gateway/cpp/sci_jgetmethods.cpp \
 sci_gateway/cpp/sci_jgetfields.cpp \
 sci_gateway/cpp/sci_jgetfield.cpp \
 sci_gateway/cpp/sci_jcompile.cpp \
-sci_gateway/cpp/sci_jnewInstance.cpp
+sci_gateway/cpp/sci_jnewInstance.cpp \
+sci_gateway/cpp/sci_jremove.cpp
 
 GIWS_WRAPPERS = src/jni/ScilabObjects.giws.xml
 

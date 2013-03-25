@@ -37,4 +37,5 @@
     <PRIMITIVE gatewayId="72" primitiveId="6" primitiveName="jgetfield" />
     <PRIMITIVE gatewayId="72" primitiveId="7" primitiveName="jcompile" />
     <PRIMITIVE gatewayId="72" primitiveId="8" primitiveName="jnewInstance" />
+    <PRIMITIVE gatewayId="72" primitiveId="9" primitiveName="jremove" />
 </GATEWAY>
