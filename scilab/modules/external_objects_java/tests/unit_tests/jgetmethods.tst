@@ -10,4 +10,7 @@
 
 s = "Hello World !";
 foo=jwrap(s);
-r = jgetmethods(foo)
+r = jgetmethods(foo);
+
+assert_checktrue(find(r=="toString") <> []);
+assert_checktrue(size(r,"*") > 30); // Currently 42

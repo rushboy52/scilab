@@ -234,6 +234,8 @@ private:
 
     //    static void initNumpy();
 
+    void getMethodResult(JavaVM * jvm_, const char * const methodName, int id, const ScilabStringStackAllocator & allocator);
+
     inline void getAccessibleFields(int id, const ScilabStringStackAllocator & allocator, const bool isField)
     {
 

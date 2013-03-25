@@ -16,7 +16,9 @@
 #include "JavaOptionsHelper.hxx"
 #include "ScilabClassLoader.hxx"
 #include "ScilabJavaObject.hxx"
-#include "ScilabJavaObjectHelper.hxx"
+#include "NoMoreScilabMemoryException.hxx"
+
+//#include "ScilabJavaObjectHelper.hxx"
 extern "C" {
 #include "getScilabJavaVM.h"
 }
@@ -1161,9 +1163,7 @@ void ScilabJavaEnvironment::getaccessiblemethods(int id, const ScilabStringStack
     JavaVM *vm = getScilabJavaVM();
     int pos;
 
-    ScilabJavaObjectHelper::getMethodResult(vm, "getAccessibleMethods", id, pos);
-    printf("id %s\n", id);
-    //    getAccessibleFields(id, allocator, false);
+    getMethodResult(vm, "getAccessibleMethods", id, allocator);
 }
 
 void ScilabJavaEnvironment::getaccessiblefields(int id, const ScilabStringStackAllocator & allocator)
@@ -1286,4 +1286,65 @@ void ScilabJavaEnvironment::writeLog(const std::string & fun, const std::string 
         *file << fun << ": " << _str << std::endl;
     }
 }
+
+#define SCILABJAVAOBJECT "org/scilab/modules/external_objects_java/ScilabJavaObject"
+
+void ScilabJavaEnvironment::getMethodResult(JavaVM * jvm_, const char * const methodName, int id, const ScilabStringStackAllocator & allocator)
+{
+    JNIEnv * curEnv = NULL;
+    jvm_->AttachCurrentThread(reinterpret_cast<void **>(&curEnv), NULL);
+    jclass cls = curEnv->FindClass(SCILABJAVAOBJECT);
+    if (cls == NULL)
+    {
+        throw GiwsException::JniClassNotFoundException(curEnv, SCILABJAVAOBJECT);
+    }
+
+    jmethodID jobjectArray_getAccessibleMethodsjintID = curEnv->GetStaticMethodID(cls, methodName, "(I)[Ljava/lang/String;");
+    if (jobjectArray_getAccessibleMethodsjintID == NULL)
+    {
+        throw GiwsException::JniMethodNotFoundException(curEnv, methodName);
+    }
+
+    jobjectArray res = static_cast<jobjectArray>(curEnv->CallStaticObjectMethod(cls, jobjectArray_getAccessibleMethodsjintID, id));
+    if (curEnv->ExceptionCheck())
+    {
+        throw GiwsException::JniCallMethodException(curEnv);
+    }
+    jint lenRow = curEnv->GetArrayLength(res);
+    jboolean isCopy = JNI_FALSE;
+
+    char **addr = new char*[lenRow];
+    jstring *resString = new jstring[lenRow];
+
+    for (jsize i = 0; i < lenRow; i++)
+    {
+        resString[i] = reinterpret_cast<jstring>(curEnv->GetObjectArrayElement(res, i));
+        addr[i] = const_cast<char *>(curEnv->GetStringUTFChars(resString[i], &isCopy));
+    }
+    int lenCol = lenRow == 0 ? 0 : 1;
+    allocator.allocate(lenRow, lenCol, addr);
+    /*
+            SciErr err = createMatrixOfString(pvApiCtx, pos, lenCol, lenRow, addr);
+
+            for (jsize i = 0; i < lenRow; i++)
+            {
+                curEnv->ReleaseStringUTFChars(resString[i], addr[i]);
+                curEnv->DeleteLocalRef(resString[i]);
+                }*/
+    delete[] addr;
+    delete[] resString;
+
+    // if (err.iErr)
+    // {
+    //     throw org_scilab_modules_external_objects_java::NoMoreScilabMemoryException();
+    // }
+
+    curEnv->DeleteLocalRef(res);
+    curEnv->DeleteLocalRef(cls);
+    if (curEnv->ExceptionCheck())
+    {
+        throw GiwsException::JniCallMethodException(curEnv);
+    }
+};
+
 }

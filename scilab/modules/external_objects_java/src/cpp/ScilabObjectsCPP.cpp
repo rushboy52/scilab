@@ -18,14 +18,14 @@
 #include "ScilabObjects.hxx"
 #include "ScilabClassLoader.hxx"
 #include "ScilabJavaClass.hxx"
-#include "ScilabJavaObjectHelper.hxx"
+//#include "ScilabJavaObjectHelper.hxx"
 #include "ScilabJavaArray.hxx"
 #include "ScilabJavaCompiler.hxx"
 #include "GiwsException.hxx"
 #include "NoMoreScilabMemoryException.hxx"
-#include "wrap.hpp"
+//#include "wrap.hpp"
 #include "wrapwithcast.hpp"
-#include "unwrap.hpp"
+//#include "unwrap.hpp"
 #include "WrapAsDirectBufferTemplate.hpp"
 /* ------------------------------------------------------------------------- */
 using namespace org_scilab_modules_external_objects_java;

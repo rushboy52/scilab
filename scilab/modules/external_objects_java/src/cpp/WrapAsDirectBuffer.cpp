@@ -16,7 +16,7 @@
 #endif
 #include <jni.h>
 #include "ScilabJavaObject.hxx"
-#include "ScilabJavaObjectHelper.hxx"
+//#include "ScilabJavaObjectHelper.hxx"
 /*--------------------------------------------------------------------------*/
 #define SCILABJAVAOBJECT "org/scilab/forge/jims/ScilabJavaObject"
 /*--------------------------------------------------------------------------*/
