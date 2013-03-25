@@ -34,4 +34,7 @@
     <PRIMITIVE gatewayId="72" primitiveId="3" primitiveName="jwrap" />
     <PRIMITIVE gatewayId="72" primitiveId="4" primitiveName="jgetmethods" />
     <PRIMITIVE gatewayId="72" primitiveId="5" primitiveName="jgetfields" />
+    <PRIMITIVE gatewayId="72" primitiveId="6" primitiveName="jgetfield" />
+    <PRIMITIVE gatewayId="72" primitiveId="7" primitiveName="jcompile" />
+    <PRIMITIVE gatewayId="72" primitiveId="8" primitiveName="jnewInstance" />
 </GATEWAY>

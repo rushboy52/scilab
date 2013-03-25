@@ -15,6 +15,7 @@
 #include "ScilabJavaEnvironment.hxx"
 #include "JavaOptionsHelper.hxx"
 #include "ScilabClassLoader.hxx"
+#include "ScilabJavaClass.hxx"
 #include "ScilabJavaObject.hxx"
 #include "NoMoreScilabMemoryException.hxx"
 
@@ -635,7 +636,9 @@ bool ScilabJavaEnvironment::isvalidobject(int id)
 
 int ScilabJavaEnvironment::newinstance(int id, int * args, int argsSize)
 {
-    throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid operation: newinstance."));
+    JavaVM *vm = getScilabJavaVM();
+    return ScilabJavaClass::newInstance(vm, id, args, argsSize);
+    //    throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid operation: newinstance."));
 }
 
 int ScilabJavaEnvironment::operation(int idA, int idB, const OperatorsType type)
@@ -859,6 +862,14 @@ int ScilabJavaEnvironment::getfield(int id, const char * fieldName)
 {
     writeLog("getfield", "Get the field named %s on object with id %d.", fieldName, id);
 
+    JavaVM *vm = getScilabJavaVM();
+    int ret = ScilabJavaObject::getField(vm, id, fieldName);
+    return ret;
+    //    allocator.allocate(1, 1, &str);
+
+
+
+    /*
     if (*fieldName == '\0')
     {
         throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid field name"));
@@ -868,7 +879,7 @@ int ScilabJavaEnvironment::getfield(int id, const char * fieldName)
     {
         throw ScilabJavaException(__LINE__, __FILE__, gettext("Private field: %s"), fieldName);
     }
-    /*
+
         PyObject * obj = scope.getObject(id);
         if (!obj)
         {

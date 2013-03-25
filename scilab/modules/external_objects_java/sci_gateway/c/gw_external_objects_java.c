@@ -23,7 +23,10 @@ static gw_generic_table Tab[] =
     {sci_jgetclassname, "jgetclassname"},
     {sci_jwrap, "jwrap"},
     {sci_jgetmethods, "jgetmethods"},
-    {sci_jgetfields, "jgetfields"}
+    {sci_jgetfields, "jgetfields"},
+    {sci_jgetfield, "jgetfield"},
+    {sci_jcompile, "jcompile"},
+    {sci_jnewInstance, "jnewInstance"}
 };
 
 /*--------------------------------------------------------------------------*/
