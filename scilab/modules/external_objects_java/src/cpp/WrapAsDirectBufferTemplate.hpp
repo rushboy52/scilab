@@ -16,7 +16,7 @@
 #define SCILABJAVAOBJECT "org/scilab/forge/jims/ScilabJavaObject"
 /*--------------------------------------------------------------------------*/
 template <typename U>
-void* ScilabJavaObjectBis::wrapAsDirectBuffer(JavaVM * jvm_, U* address, long size, int *javaID)
+void* ScilabJavaObjectHelper::wrapAsDirectBuffer(JavaVM * jvm_, U* address, long size, int *javaID)
 {
     JNIEnv * curEnv = NULL;
     jobject dbuffer = NULL;
@@ -25,7 +25,7 @@ void* ScilabJavaObjectBis::wrapAsDirectBuffer(JavaVM * jvm_, U* address, long si
     jvm_->AttachCurrentThread(reinterpret_cast<void **>(&curEnv), NULL);
     jclass cls = curEnv->FindClass(SCILABJAVAOBJECT);
 
-    jmethodID id = curEnv->GetStaticMethodID(cls, ScilabJavaObjectBis::getFunctionNameForDB(address), "(Ljava/nio/ByteBuffer;)I");
+    jmethodID id = curEnv->GetStaticMethodID(cls, ScilabJavaObjectHelper::getFunctionNameForDB(address), "(Ljava/nio/ByteBuffer;)I");
     dbuffer = curEnv->NewDirectByteBuffer((void*)address, (jlong)size);
 
     ref = curEnv->NewGlobalRef(dbuffer);

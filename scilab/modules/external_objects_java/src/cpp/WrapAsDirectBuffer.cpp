@@ -16,11 +16,11 @@
 #endif
 #include <jni.h>
 #include "ScilabJavaObject.hxx"
-#include "ScilabJavaObjectBis.hxx"
+#include "ScilabJavaObjectHelper.hxx"
 /*--------------------------------------------------------------------------*/
 #define SCILABJAVAOBJECT "org/scilab/forge/jims/ScilabJavaObject"
 /*--------------------------------------------------------------------------*/
-void ScilabJavaObjectBis::releaseDirectBuffer(JavaVM * jvm_, void** ref, int* javaID, int len)
+void ScilabJavaObjectHelper::releaseDirectBuffer(JavaVM * jvm_, void** ref, int* javaID, int len)
 {
     JNIEnv * curEnv = NULL;
     jvm_->AttachCurrentThread(reinterpret_cast<void **>(&curEnv), NULL);

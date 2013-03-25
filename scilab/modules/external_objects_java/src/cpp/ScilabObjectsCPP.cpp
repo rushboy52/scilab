@@ -18,7 +18,7 @@
 #include "ScilabObjects.hxx"
 #include "ScilabClassLoader.hxx"
 #include "ScilabJavaClass.hxx"
-#include "ScilabJavaObjectBis.hxx"
+#include "ScilabJavaObjectHelper.hxx"
 #include "ScilabJavaArray.hxx"
 #include "ScilabJavaCompiler.hxx"
 #include "GiwsException.hxx"
@@ -89,7 +89,7 @@ void unwrapstring(int id, int pos, char **errmsg)
     {
         try
         {
-            ScilabJavaObjectBis::unwrapString(vm, id, pos);
+            ScilabJavaObjectHelper::unwrapString(vm, id, pos);
         }
         catch (GiwsException::JniException e)
         {
@@ -109,7 +109,7 @@ void unwraprowstring(int id, int pos, char **errmsg)
     {
         try
         {
-            ScilabJavaObjectBis::unwrapRowString(vm, id, pos);
+            ScilabJavaObjectHelper::unwrapRowString(vm, id, pos);
         }
         catch (GiwsException::JniException e)
         {
@@ -129,7 +129,7 @@ void unwrapmatstring(int id, int pos, char **errmsg)
     {
         try
         {
-            ScilabJavaObjectBis::unwrapMatString(vm, id, pos);
+            ScilabJavaObjectHelper::unwrapMatString(vm, id, pos);
         }
         catch (GiwsException::JniException e)
         {
@@ -437,7 +437,7 @@ void getaccessiblemethods(int id, int pos, char **errmsg)
     {
         try
         {
-            ScilabJavaObjectBis::getMethodResult(vm, "getAccessibleMethods", id, pos);
+            ScilabJavaObjectHelper::getMethodResult(vm, "getAccessibleMethods", id, pos);
         }
         catch (GiwsException::JniException e)
         {
@@ -457,7 +457,7 @@ void getaccessiblefields(int id, int pos, char **errmsg)
     {
         try
         {
-            ScilabJavaObjectBis::getMethodResult(vm, "getAccessibleFields", id, pos);
+            ScilabJavaObjectHelper::getMethodResult(vm, "getAccessibleFields", id, pos);
         }
         catch (GiwsException::JniException e)
         {
@@ -604,7 +604,7 @@ void releasedirectbuffer(void **ref, int* id, int len, char **errmsg)
     {
         try
         {
-            ScilabJavaObjectBis::releaseDirectBuffer(vm, ref, id, len);
+            ScilabJavaObjectHelper::releaseDirectBuffer(vm, ref, id, len);
         }
         catch (GiwsException::JniException e)
         {

@@ -24,7 +24,7 @@
         return "wrapAsDirect" #Type "Buffer";                           \
     }
 
-struct ScilabJavaObjectBis
+struct ScilabJavaObjectHelper
 {
 
     __getFunctionNameForDB__(Double, double);

@@ -16,7 +16,7 @@
 #include "JavaOptionsHelper.hxx"
 #include "ScilabClassLoader.hxx"
 #include "ScilabJavaObject.hxx"
-#include "ScilabJavaObjectBis.hxx"
+#include "ScilabJavaObjectHelper.hxx"
 extern "C" {
 #include "getScilabJavaVM.h"
 }
@@ -1161,9 +1161,9 @@ void ScilabJavaEnvironment::getaccessiblemethods(int id, const ScilabStringStack
     JavaVM *vm = getScilabJavaVM();
     int pos;
 
-    ScilabJavaObjectBis::getMethodResult(vm, "getAccessibleMethods", id, pos);
-    printf("id %s\n",id);
-//    getAccessibleFields(id, allocator, false);
+    ScilabJavaObjectHelper::getMethodResult(vm, "getAccessibleMethods", id, pos);
+    printf("id %s\n", id);
+    //    getAccessibleFields(id, allocator, false);
 }
 
 void ScilabJavaEnvironment::getaccessiblefields(int id, const ScilabStringStackAllocator & allocator)
