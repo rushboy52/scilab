@@ -20,6 +20,7 @@ EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int sci_jimport(char *fname, unsigned long f
 EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int sci_jgetclassname(char *fname, unsigned long fname_len);
 EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int sci_jwrap(char *fname, unsigned long fname_len);
 EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int sci_jgetmethods(char *fname, unsigned long fname_len);
+EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int sci_jgetfields(char *fname, unsigned long fname_len);
 /*--------------------------------------------------------------------------*/
 #endif /* __GW_EXTERNAL_OBJECTS_H__ */
 /*--------------------------------------------------------------------------*/

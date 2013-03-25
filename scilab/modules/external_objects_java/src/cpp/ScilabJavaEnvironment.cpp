@@ -1161,14 +1161,14 @@ void ScilabJavaEnvironment::getaccessiblemethods(int id, const ScilabStringStack
 {
     writeLog("getaccessiblemethods", "Get accessible methods on object with id %d.", id);
     JavaVM *vm = getScilabJavaVM();
-    int pos;
-
     getMethodResult(vm, "getAccessibleMethods", id, allocator);
 }
 
 void ScilabJavaEnvironment::getaccessiblefields(int id, const ScilabStringStackAllocator & allocator)
 {
     writeLog("getaccessiblefields", "Get accessible fields on object with id %d.", id);
+    JavaVM *vm = getScilabJavaVM();
+    getMethodResult(vm, "getAccessibleFields", id, allocator);
     getAccessibleFields(id, allocator, true);
 }
 
