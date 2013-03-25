@@ -9,10 +9,12 @@
  * http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
  *
  */
+
 package org.scilab.modules.external_objects_java;
 
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
 import java.nio.DoubleBuffer;
@@ -24,6 +26,12 @@ import java.nio.ByteOrder;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.io.IOException;
+import java.util.logging.FileHandler;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
+
 /**
  * Main class to communicate with Scilab via jni interface generated with Giws.
  * @autor Calixte DENIZET
@@ -31,16 +39,30 @@ import java.util.Map;
 public class ScilabJavaObject {
 
     private static final int INITIALCAPACITY = 1024;
-    private static final Map<Class, Integer> unwrappableType = new HashMap<Class, Integer>(27);
+    private static final Map<Class, Integer> unwrappableType = new HashMap<Class, Integer>(35);
     private static final Class[] returnType = new Class[1];
+
+    static final Map<Class, Class> primTypes = new HashMap<Class, Class>(8);
 
     private static int currentPos = 1;
     private static FreePlace freePlace = new FreePlace();
+
+    static boolean debug;
+    static Logger logger;
 
     protected static int currentCapacity = INITIALCAPACITY;
     protected static ScilabJavaObject[] arraySJO = new ScilabJavaObject[currentCapacity];
 
     static {
+        primTypes.put(double.class, Double.class);
+        primTypes.put(float.class, Float.class);
+        primTypes.put(int.class, Integer.class);
+        primTypes.put(short.class, Short.class);
+        primTypes.put(byte.class, Byte.class);
+        primTypes.put(char.class, Character.class);
+        primTypes.put(long.class, Long.class);
+        primTypes.put(boolean.class, Boolean.class);
+
         unwrappableType.put(double.class, 0);
         unwrappableType.put(double[].class, 1);
         unwrappableType.put(double[][].class, 2);
@@ -68,6 +90,15 @@ public class ScilabJavaObject {
         unwrappableType.put(long.class, 24);
         unwrappableType.put(long[].class, 25);
         unwrappableType.put(long[][].class, 26);
+        unwrappableType.put(Double.class, 27);
+        unwrappableType.put(Integer.class, 28);
+        unwrappableType.put(Long.class, 29);
+        unwrappableType.put(Byte.class, 30);
+        unwrappableType.put(Character.class, 31);
+        unwrappableType.put(Boolean.class, 32);
+        unwrappableType.put(Float.class, 33);
+        unwrappableType.put(Short.class, 34);
+
         arraySJO[0] = new ScilabJavaObject(null, null);
     }
 
@@ -104,15 +135,25 @@ public class ScilabJavaObject {
 
             arraySJO[this.id] = this;
 
+            if (debug) {
+                logger.log(Level.INFO, "Object creation with id=" + this.id + " and class=" + clazz.toString());
+            }
+
             if (currentPos >= currentCapacity) {
                 currentCapacity = currentCapacity * 2;
                 ScilabJavaObject[] arr = new ScilabJavaObject[currentCapacity];
                 System.arraycopy(arraySJO, 0, arr, 0, currentPos);
                 arraySJO = arr;
+                if (debug) {
+                    logger.log(Level.INFO, "Scope copy");
+                }
             }
 
             this.methods = ScilabJavaMethod.getMethods(clazz);
         } else {
+            if (debug) {
+                logger.log(Level.INFO, "Object creation with id=0");
+            }
             this.id = 0;
         }
     }
@@ -123,10 +164,60 @@ public class ScilabJavaObject {
     public static void initScilabJavaObject() { }
 
     /**
+     * @param filename the log file
+     */
+    public static void enableTrace(String filename) throws ScilabJavaException {
+        debug = true;
+        logger = Logger.getLogger("JIMS");
+
+        try {
+            FileHandler fh = new FileHandler(filename, true);
+            logger.addHandler(fh);
+            logger.setLevel(Level.ALL);
+            SimpleFormatter formatter = new SimpleFormatter();
+            fh.setFormatter(formatter);
+        } catch (SecurityException e) {
+            debug = false;
+            throw new ScilabJavaException("A security exception has been thrown:\n" + e);
+        } catch (IOException e) {
+            debug = false;
+            throw new ScilabJavaException("I/O problem:\n" + e);
+        }
+    }
+
+    /**
+     * Disable trace
+     */
+    public static void disableTrace() {
+        if (debug) {
+            logger.removeHandler(logger.getHandlers()[0]);
+            debug = false;
+        }
+    }
+
+    /**
      * {@inheritedDoc}
      */
     public String toString() {
-        return object == null ? "null" : object.toString();
+        if (object == null) {
+            return "null";
+        }
+
+        String str = object.toString();
+        if (str != null) {
+            return str;
+        }
+
+        return "Instance of " + object.getClass() + " with hashcode " + System.identityHashCode(object);
+    }
+
+    /**
+     * Create a new identical reference to a java object
+     * @return A deep copy of this {@link ScilabJavaObject}
+     */
+    @Override
+    protected ScilabJavaObject clone() {
+        return new ScilabJavaObject(object, clazz);
     }
 
     /**
@@ -134,13 +225,19 @@ public class ScilabJavaObject {
      * @return the string to represent this object
      */
     public static String getRepresentation(final int id) {
-        System.out.println("Dedans getRepresentation / id "+id + " arraySJO " +arraySJO.length);
         if (arraySJO[id] != null) {
-            System.out.println("foo = " + arraySJO[id]);
             return arraySJO[id].toString();
         }
 
         return "Invalid Java object";
+    }
+
+    /**
+     * @param id the Java Object id
+     * @return true if the object is valid
+     */
+    public static boolean isValidJavaObject(final int id) {
+        return id == 0 || (id > 0 && arraySJO[id] != null);
     }
 
     /**
@@ -150,6 +247,21 @@ public class ScilabJavaObject {
      */
     public static int getArrayElement(final int id, final int[] index) throws ScilabJavaException {
         if (id > 0) {
+            if (debug) {
+                StringBuffer buf = new StringBuffer();
+                buf.append("(");
+                if (index.length > 0) {
+                    int i = 0;
+                    for (; i < index.length - 1; i++) {
+                        buf.append(Integer.toString(index[i]));
+                        buf.append(",");
+                    }
+                    buf.append(Integer.toString(index[i]));
+                }
+                buf.append(")");
+                logger.log(Level.INFO, "Get array element: array id=" + id + " at position " + buf.toString());
+            }
+
             if (arraySJO[id] == null) {
                 throw new ScilabJavaException("Invalid Java object");
             }
@@ -166,6 +278,21 @@ public class ScilabJavaObject {
      */
     public static void setArrayElement(final int id, final int[] index, final int idArg) throws ScilabJavaException {
         if (id > 0) {
+            if (debug) {
+                StringBuffer buf = new StringBuffer();
+                buf.append("(");
+                if (index.length > 0) {
+                    int i = 0;
+                    for (; i < index.length - 1; i++) {
+                        buf.append(Integer.toString(index[i]));
+                        buf.append(",");
+                    }
+                    buf.append(Integer.toString(index[i]));
+                }
+                buf.append(")");
+                logger.log(Level.INFO, "Set array element: array id=" + id + " at position " + buf.toString() + " and element id=" + idArg);
+            }
+
             if (arraySJO[id] == null) {
                 throw new ScilabJavaException("Invalid Java object");
             }
@@ -182,6 +309,10 @@ public class ScilabJavaObject {
      */
     public static String[] getAccessibleMethods(final int id) throws ScilabJavaException {
         if (id > 0) {
+            if (debug) {
+                logger.log(Level.INFO, "Get accessible methods in object id=" + id);
+            }
+
             if (arraySJO[id] == null) {
                 throw new ScilabJavaException("Invalid Java object");
             }
@@ -197,6 +328,10 @@ public class ScilabJavaObject {
      */
     public static String[] getAccessibleFields(final int id) throws ScilabJavaException {
         if (id > 0) {
+            if (debug) {
+                logger.log(Level.INFO, "Get accessible fields in object id=" + id);
+            }
+
             if (arraySJO[id] == null) {
                 throw new ScilabJavaException("Invalid Java object");
             }
@@ -221,9 +356,11 @@ public class ScilabJavaObject {
      * @return the class name of the object represented by id
      */
     public static String getClassName(final int id) throws ScilabJavaException {
-        System.out.println("Dedans getClassName / id "+id);
         if (id > 0) {
-            System.out.println("arraySJO[id] = "+arraySJO[id]);
+            if (debug) {
+                logger.log(Level.INFO, "Get class name of object id=" + id);
+            }
+
             if (arraySJO[id] == null) {
                 throw new ScilabJavaException("Invalid Java object");
             }
@@ -243,6 +380,10 @@ public class ScilabJavaObject {
         if (id > 0) {
             Field f = null;
             try {
+                if (debug) {
+                    logger.log(Level.INFO, "Set field \'" + fieldName + "\' in object id=" + id + " with value id=" + idarg);
+                }
+
                 if (arraySJO[id] == null) {
                     throw new ScilabJavaException("Invalid Java object");
                 }
@@ -281,6 +422,10 @@ public class ScilabJavaObject {
     public static int getField(final int id, final String fieldName) throws ScilabJavaException {
         if (id > 0) {
             try {
+                if (debug) {
+                    logger.log(Level.INFO, "Get field \'" + fieldName + "\' in object id=" + id);
+                }
+
                 if (arraySJO[id] == null) {
                     throw new ScilabJavaException("Invalid Java object");
                 }
@@ -332,6 +477,10 @@ public class ScilabJavaObject {
      */
     public static int getFieldType(final int id, final String fieldName) {
         if (id > 0 && arraySJO[id] != null) {
+            if (debug) {
+                logger.log(Level.INFO, "Get field type of \'" + fieldName + "\' in object id=" + id);
+            }
+
             if (arraySJO[id].methods.containsKey(fieldName)) {
                 return 0;
             }
@@ -363,6 +512,21 @@ public class ScilabJavaObject {
      */
     public static int invoke(final int id, final String methName, final int[] args) throws ScilabJavaException {
         if (id > 0) {
+            if (debug) {
+                StringBuffer buf = new StringBuffer();
+                buf.append("(");
+                if (args.length > 0) {
+                    int i = 0;
+                    for (; i < args.length - 1; i++) {
+                        buf.append(Integer.toString(args[i]));
+                        buf.append(",");
+                    }
+                    buf.append(Integer.toString(args[i]));
+                }
+                buf.append(")");
+                logger.log(Level.INFO, "Invoke method \'" + methName + "\' in object id=" + id + " with arguments id=" + buf.toString());
+            }
+
             if (arraySJO[id] != null) {
                 return new ScilabJavaObject(arraySJO[id].methods.get(methName).invoke(arraySJO[id].object, returnType, args), returnType[0]).id;
             }
@@ -379,6 +543,10 @@ public class ScilabJavaObject {
      */
     public static int javaCast(final int id, final String className) throws ScilabJavaException {
         if (id > 0) {
+            if (debug) {
+                logger.log(Level.INFO, "Cast object id=" + id + " to class " + className);
+            }
+
             final int idC = ScilabClassLoader.loadJavaClass(className, false);
             final Class clazz = (Class) arraySJO[idC].object;
             try {
@@ -394,11 +562,36 @@ public class ScilabJavaObject {
     }
 
     /**
+     * @param id the Java Object id
+     * @param classId the target class id
+     * @return the id of the cast result
+     */
+    public static int javaCast(final int id, final int classId) throws ScilabJavaException {
+        if (id > 0) {
+            if (debug) {
+                logger.log(Level.INFO, "Cast object id=" + id + " to class with id=" + classId);
+            }
+
+            final Class clazz = (Class) arraySJO[classId].object;
+            try {
+                return new ScilabJavaObject(clazz.cast(arraySJO[id].object), clazz).id;
+            } catch (ClassCastException e) {
+                throw new ScilabJavaException("Cannot cast object " + getClassName(id) + " into " + getClassName(classId));
+            }
+        } else {
+            throw new ScilabJavaException("null is not an object");
+        }
+    }
+
+    /**
      * Remove an object.
      * @param id the Java Object id
      */
     public static void removeScilabJavaObject(final int id) {
         if (id > 0 && arraySJO[id] != null) {
+            if (debug) {
+                logger.log(Level.INFO, "Remove object id=" + id);
+            }
             freePlace.addFreePlace(id);
             if (arraySJO[id] instanceof ScilabJavaClass) {
                 ScilabClassLoader.removeID(id);
@@ -409,9 +602,26 @@ public class ScilabJavaObject {
     }
 
     /**
+     * Set the limit of a direct buffer to 0 to make it unusable.
+     * @param id the Java Object id
+     */
+    public static void limitDirectBuffer(final int id) {
+        if (id > 0 && arraySJO[id] != null && (arraySJO[id].object instanceof Buffer)) {
+            if (debug) {
+                logger.log(Level.INFO, "Limit direct buffer with id=" + id);
+            }
+
+            ((Buffer) arraySJO[id].object).limit(0);
+        }
+    }
+
+    /**
      * Remove all the objects and start a garbage collection
      */
     public static void garbageCollect() {
+        if (debug) {
+            logger.log(Level.INFO, "Garbage collection");
+        }
         currentPos = 1;
         currentCapacity = INITIALCAPACITY;
         arraySJO = new ScilabJavaObject[currentCapacity];
@@ -1015,7 +1225,7 @@ public class ScilabJavaObject {
         }
 
         final void addFreePlace(final int n) {
-            if (currentPos == fp.length) {
+            if (currentPos == fp.length - 1) {
                 int[] newFp = new int[(int) (1.5 * fp.length)];
                 System.arraycopy(fp, 0, newFp, 0, fp.length);
                 fp = newFp;

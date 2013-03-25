@@ -9,9 +9,11 @@
  * http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
  *
  */
+
 package org.scilab.modules.external_objects_java;
 
 import java.net.URL;
+import java.util.logging.Level;
 
 /**
  * A Java Class wrapper
@@ -52,6 +54,21 @@ public class ScilabJavaClass extends ScilabJavaObject {
      * @param the id of the resulting object
      */
     public static int newInstance(int id, int[] args) throws ScilabJavaException {
+        if (ScilabJavaObject.debug) {
+            StringBuffer buf = new StringBuffer();
+            buf.append("(");
+            if (args.length > 0) {
+                int i = 0;
+                for (; i < args.length - 1; i++) {
+                    buf.append(Integer.toString(args[i]));
+                    buf.append(",");
+                }
+                buf.append(Integer.toString(args[i]));
+            }
+            buf.append(")");
+            ScilabJavaObject.logger.log(Level.INFO, "New instance of class id=" + id + " with args=" + buf.toString());
+        }
+
         if (id == 0) {
             throw new ScilabJavaException("null cannot be instantiated");
         }
@@ -59,5 +76,16 @@ public class ScilabJavaClass extends ScilabJavaObject {
             return new ScilabJavaObject(((ScilabJavaClass) arraySJO[id]).sjc.invoke(args)).id;
         }
         throw new ScilabJavaException("The object " + id + " is not a valid Class object");
+    }
+
+    /**
+     * Create a new identical reference to a Java class
+     * @return A deep copy of this {@link ScilabJavaClass}
+     */
+    @Override
+    protected ScilabJavaObject clone() {
+        ScilabJavaClass	sjcazz = new ScilabJavaClass(clazz);
+        sjcazz.setURL(getURL());
+        return sjcazz;
     }
 }

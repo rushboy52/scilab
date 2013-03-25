@@ -9,9 +9,12 @@
  * http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
  *
  */
+
 package org.scilab.modules.external_objects_java;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -68,75 +71,39 @@ public class ScilabJavaMethod {
      */
     protected Object call(Object obj, Class[] returnType, Object[] args, Class[] argsClass) throws ScilabJavaException {
         try {
-            Method meth = findMethod(name, clazz, argsClass, args);
-            returnType[0] = meth.getReturnType();
-
+            Method meth = FunctionArguments.findMethod(name, clazz.getMethods(), argsClass, args);
+            Object ret;
             if (Modifier.isStatic(meth.getModifiers())) {
-                return meth.invoke(null, args);
+                ret = meth.invoke(null, args);
+            } else {
+                ret = meth.invoke(obj, args);
             }
-            return meth.invoke(obj, args);
+
+            Class returned = meth.getReturnType();
+            returnType[0] = ret != null ? ret.getClass() : returned;
+
+            if (returned == double.class || returned == int.class ||
+                    returned == short.class || returned == float.class ||
+                    returned == boolean.class || returned == char.class ||
+                    returned == byte.class || returned == long.class) {
+                returnType[0] = returned;
+            }
+            return ret;
         } catch (IllegalAccessException e) {
             throw new ScilabJavaException("Illegal access to the method " + name + ".");
         } catch (IllegalArgumentException e) {
-            throw new ScilabJavaException("Illegal argument in the method " + name + " : \n" + e.getMessage());
+            throw new ScilabJavaException("Illegal argument in the method " + name + ": \n" + e.getMessage());
         } catch (NullPointerException e) {
             throw new ScilabJavaException("The method " + name + " is called on a null object.");
         } catch (ExceptionInInitializerError e) {
-            throw new ScilabJavaException("Initializer error with method " + name + " :\n" + e.getMessage());
+            throw new ScilabJavaException("Initializer error with method " + name + ":\n" + e.getMessage());
         } catch (InvocationTargetException e) {
-            throw new ScilabJavaException("An exception has been thrown in calling the method " + name + " :\n" + e.getCause().toString());
+            throw new ScilabJavaException("An exception has been thrown in calling the method " + name + ":\n" + e.getCause().toString());
         } catch (NoSuchMethodException e) {
             throw new ScilabJavaException("No method " + name + " in the class " + clazz.getName() + " or bad arguments type.");
+        } catch (FunctionArguments.TooManyMethodsException e) {
+            throw new ScilabJavaException("Too many possible methods named " + name + " in the class " + clazz.getName() + ".");
         }
-    }
-
-    /**
-     * Find a valid constructor. An argument can be null (thanks to Fabien Viale).
-     * @param clazz the class where to search the constructor
-     * @param argsClass the class of the arguments
-     * @param args the arguments
-     * @return a valid constructor
-     */
-    public static Method findMethod(String name, Class clazz, Class[] argsClass, Object[] args) throws NoSuchMethodException {
-        Method[] all = clazz.getMethods();
-        String internName = name.intern();
-        boolean modified = false;
-        do {
-            for (Method meth : all) {
-                if (meth.getName() == internName) {
-                    Class[] types = meth.getParameterTypes();
-                    if (types.length == argsClass.length) {
-                        boolean ok = true;
-                        for (int i = 0; i < types.length; i++) {
-                            if (args[i] != null && !argsClass[i].equals(Void.class) && !types[i].isAssignableFrom(argsClass[i])) {
-                                ok = false;
-                                break;
-                            }
-                        }
-                        if (ok) {
-                            return meth;
-                        }
-                    }
-                }
-            }
-
-            if (!modified) {
-                /* In scilab it could be boring to write str.substring(int32(1),int32(5))
-                   so we search if a double is an integer and we convert it into an int
-                   and retry to find the method */
-                for (int i = 0; i < args.length; i++) {
-                    if (argsClass[i] == double.class && ((Double) args[i]).intValue() == ((Double) args[i]).doubleValue()) {
-                        argsClass[i] = int.class;
-                        args[i] = ((Double) args[i]).intValue();
-                        modified = true;
-                    }
-                }
-            } else {
-                modified = false;
-            }
-        } while (modified);
-
-        throw new NoSuchMethodException("");
     }
 
     /**

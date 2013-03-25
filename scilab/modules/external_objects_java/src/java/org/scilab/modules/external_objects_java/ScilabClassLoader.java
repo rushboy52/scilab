@@ -9,13 +9,15 @@
  * http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
  *
  */
+
 package org.scilab.modules.external_objects_java;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.security.CodeSource;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * A class loader... When a class is needed, the first time the default system class loader is used
@@ -47,36 +49,53 @@ public class ScilabClassLoader {
      */
     public static int loadJavaClass(String name, boolean allowReload) throws ScilabJavaException {
         Integer id = clazz.get(name);
+        int retId = -1;
+
+        if (ScilabJavaObject.debug) {
+            ScilabJavaObject.logger.log(Level.INFO, "Load Java class \'" + name + "\' and reload=" + allowReload);
+        }
 
         try {
-            if (id != null && allowReload) {
-                ScilabJavaClass sjc = (ScilabJavaClass) ScilabJavaObject.arraySJO[id];
-                URL url = sjc.getURL();
-                if (url == null) {
-                    return id;
+            if (id != null) {
+                if (allowReload) {
+                    ScilabJavaClass sjc = (ScilabJavaClass) ScilabJavaObject.arraySJO[id];
+                    URL url = sjc.getURL();
+                    if (url == null) {
+                        System.err.println("WARN: The class " + name + " could not be reloaded");
+                        ScilabJavaObject clone = ScilabJavaObject.arraySJO[id].clone();
+                        retId = clone.id;
+                    } else {
+                        Class cl = new URLClassLoader(new URL[] {url}, null).loadClass(name);
+                        ScilabJavaMethod.methsInClass.remove(sjc.clazz);
+                        ScilabJavaObject.removeScilabJavaObject(id);
+                        sjc = new ScilabJavaClass(cl);
+                        sjc.setURL(url);
+                        clazz.put(name, sjc.id);
+                        zzalc.put(sjc.id, name);
+                        retId = sjc.id;
+                    }
+                } else {
+                    ScilabJavaObject clone = ScilabJavaObject.arraySJO[id].clone();
+                    retId = clone.id;
                 }
-
-                Class cl = new URLClassLoader(new URL[] {url}, null).loadClass(name);
-                ScilabJavaMethod.methsInClass.remove(sjc.clazz);
-                ScilabJavaObject.removeScilabJavaObject(id);
-                sjc = new ScilabJavaClass(cl);
-                sjc.setURL(url);
-                clazz.put(name, sjc.id);
-                zzalc.put(sjc.id, name);
-
-                return sjc.id;
             } else {
                 ScilabJavaClass sjc = new ScilabJavaClass(ClassLoader.getSystemClassLoader().loadClass(name));
                 sjc.setURL(getLocation(sjc.clazz));
                 clazz.put(name, sjc.id);
                 zzalc.put(sjc.id, name);
-                return sjc.id;
+                retId = sjc.id;
             }
         } catch (Exception e) {
             System.err.println(e);
             e.printStackTrace();
             throw new ScilabJavaException("Cannot find the class " + name + ". Check the name or if the classpath contains it.");
         }
+
+        if (ScilabJavaObject.debug) {
+            ScilabJavaObject.logger.log(Level.INFO, "The loaded Java class has id=" + retId + " and URL=" + ((ScilabJavaClass) ScilabJavaObject.arraySJO[retId]).getURL());
+        }
+
+        return retId;
     }
 
     /**

@@ -22,6 +22,8 @@ import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Locale;
+import java.util.ServiceLoader;
+import java.util.logging.Level;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticCollector;
@@ -33,9 +35,17 @@ import javax.tools.ToolProvider;
 import javax.tools.JavaCompiler.CompilationTask;
 import javax.tools.JavaFileObject.Kind;
 
+/**
+ * Class to provide a java compiler to JIMS.
+ * Try to find the compiler provide with JDK and if it is not found, use the Eclipse Compiler for Java
+ * @author Calixte DENIZET
+ */
 public class ScilabJavaCompiler {
 
+    private static final String JAVACOMPILER = "javax.tools.JavaCompiler";
     private static final String binpath = System.getProperty("java.io.tmpdir") + File.separator + "JIMS" + File.separator + "bin";
+
+    private static JavaCompiler compiler;
 
     static {
         new File(System.getProperty("java.io.tmpdir") + File.separator + "JIMS").mkdir();
@@ -48,10 +58,42 @@ public class ScilabJavaCompiler {
         }
     }
 
-    public static int compileCode(String className, String[] code) throws ScilabJavaException {
-        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+    /**
+     * Just find a compiler
+     */
+    private static void findCompiler() throws ScilabJavaException {
         if (compiler == null) {
-            throw new ScilabJavaException("No compiler available on this system.\nPerhaps, you should add tools.jar (from JDK) in your classpath.");
+            try {
+                compiler = ToolProvider.getSystemJavaCompiler();
+            } catch (Exception e) { }
+
+            if (compiler == null) {
+                ServiceLoader<JavaCompiler> jcompilers = ServiceLoader.load(JavaCompiler.class);
+                for (JavaCompiler jc : jcompilers) {
+                    if (jc != null) {
+                        compiler = jc;
+                        break;
+                    }
+                }
+            }
+
+            if (compiler == null) {
+                throw new ScilabJavaException("No java compiler in the classpath\nCheck for tools.jar (comes from JDK) or ecj-3.6.x.ajr (Eclipse Compiler for Java)");
+            }
+        }
+    }
+
+    /**
+     * Compile code got as string
+     * @param className the class name
+     * @param code the lines giving the code to compile
+     * @return an integer corresponding to the compiled and loaded class.
+     */
+    public static int compileCode(String className, String[] code) throws ScilabJavaException {
+        findCompiler();
+
+        if (ScilabJavaObject.debug) {
+            ScilabJavaObject.logger.log(Level.INFO, "Compilation of class \'" + className + "\'");
         }
 
         DiagnosticCollector<JavaFileObject> diagnostics = new DiagnosticCollector<JavaFileObject>();
@@ -78,6 +120,10 @@ public class ScilabJavaCompiler {
         }
     }
 
+    /**
+     * Add a class in the classpath
+     * @param url the class url
+     */
     public static void addURLToClassPath(URL url) {
         URLClassLoader sysloader = (URLClassLoader) ClassLoader.getSystemClassLoader();
         try {
@@ -93,12 +139,15 @@ public class ScilabJavaCompiler {
         }
     }
 
+    /**
+     * Inner class to handle String as File
+     */
     private static class SourceString extends SimpleJavaFileObject {
 
         private final String code;
 
         private SourceString(String className, String[] code) {
-            super(URI.create(className.replace('.', '/') + Kind.SOURCE.extension), Kind.SOURCE);
+            super(new File(binpath + "/" + className.replace('.', '/') + Kind.SOURCE.extension).toURI(), Kind.SOURCE);
 
             StringBuffer buf = new StringBuffer();
             for (String str : code) {

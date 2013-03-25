@@ -17,7 +17,6 @@ package org.scilab.modules.external_objects_java;
  *
  * @author Calixte DENIZET
  */
-@SuppressWarnings(value = { "serial" })
 public class ScilabJavaException extends Exception {
 
     /**

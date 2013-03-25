@@ -16,6 +16,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 
 /**
  * Tools for arrays
@@ -60,8 +61,29 @@ public class ScilabJavaArray {
      */
     public static int newInstance(String className, int[] dims) throws ScilabJavaException {
         Class cl = null;
+
+        if (ScilabJavaObject.debug) {
+            StringBuffer buf = new StringBuffer();
+            buf.append("(");
+            if (dims.length > 0) {
+                int i = 0;
+                for (; i < dims.length - 1; i++) {
+                    buf.append(Integer.toString(dims[i]));
+                    buf.append(",");
+                }
+                buf.append(Integer.toString(dims[i]));
+            }
+            buf.append(")");
+            ScilabJavaObject.logger.log(Level.INFO, "Array creation: base class is \'" + className + "\' with dims=" + buf.toString());
+        }
+
         try {
-            cl = Class.forName(className);
+            int id = ScilabClassLoader.loadJavaClass(className, false);
+            if (id == 0) {
+                cl = (Class) ScilabJavaObject.arraySJO[id].object;
+            } else {
+                cl = Class.forName(className);
+            }
         } catch (ClassNotFoundException e) {
             throw new ScilabJavaException("Cannot find the class " + className);
         }
@@ -115,7 +137,11 @@ public class ScilabJavaArray {
 
         if (obj != null && obj.getClass().isArray()) {
             if (index[i] < Array.getLength(obj)) {
-                Array.set(obj, index[i], x);
+                try {
+                    Array.set(obj, index[i], x);
+                } catch (IllegalArgumentException e) {
+                    throw new ScilabJavaException("Array " + obj + " cannot contain object which is an instance of " + x.getClass());
+                }
             } else {
                 throw new ScilabJavaException("Problem in setting " + index[i] + "-th element: " + index[i] + ">" + (Array.getLength(obj) - 1));
             }
@@ -134,7 +160,7 @@ public class ScilabJavaArray {
         /* TODO:
            1) Verifier qu'on peut faire mieux avec des templates
            2) Faire des tests (pas sur que ca passe...)
-         */
+        */
         String info[] = getBasicType(array);
         if (info == null) {
             return null;
