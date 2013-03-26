@@ -1,5 +1,5 @@
 // Scilab ( http://www.scilab.org/ ) - This file is part of Scilab
-// Copyright (C) 2011 - DIGITEO
+// Copyright (C) 2013 - S/E - Sylvestre Ledru
 //
 // This file must be used under the terms of the CeCILL.
 // This source file is licensed as described in the file COPYING, which
@@ -7,4 +7,4 @@
 // are also available at
 // http://www.cecill.info/licences/Licence_CeCILL_V2-en.txt
 
-//add_help_chapter("External objects",SCI+"/modules/external_objects/help/en_US",%T);
+//add_help_chapter("Java from Scilab",SCI+"/modules/external_objects_java/help/en_US",%T);
