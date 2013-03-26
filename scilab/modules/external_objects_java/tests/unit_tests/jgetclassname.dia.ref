@@ -11,24 +11,14 @@
 //
 // <-- JVM MANDATORY -->
 //
-
 s = jwrap("Hello World !");
-if jgetclassname(s) <> "java.lang.String" then pause, end
+if jgetclassname(s) <> "java.lang.String" then bugmes();quit;end
 jremove s;
-
-if jgetclassname("toto") <> "java.lang.String" then pause, end
-
-if jgetclassname(1) <> "double" then pause, end
-
-if jgetclassname(%t) <> "boolean" then pause, end
-
-if jgetclassname(int8(2)) <> "char" then pause, end
-
-if jgetclassname(int16(2)) <> "short" then pause, end
-
-if jgetclassname(int32(2)) <> "int" then pause, end
-
+if jgetclassname("toto") <> "java.lang.String" then bugmes();quit;end
+if jgetclassname(1) <> "double" then bugmes();quit;end
+if jgetclassname(%t) <> "boolean" then bugmes();quit;end
+if jgetclassname(int8(2)) <> "char" then bugmes();quit;end
+if jgetclassname(int16(2)) <> "short" then bugmes();quit;end
+if jgetclassname(int32(2)) <> "int" then bugmes();quit;end
 s = scf();
 if execstr("jgetclassname(s)", "errcatch") <> 999, end
-
-
