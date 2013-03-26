@@ -20,7 +20,7 @@
 #include "NoMoreScilabMemoryException.hxx"
 #include "JIMSwrapunwrap.h"
 
-#define SCILABJAVAOBJECT "org/scilab/forge/jims/ScilabJavaObject"
+#define SCILABJAVAOBJECT "org/scilab/modules/external_objects_java/ScilabJavaObject"
 
 template <typename T, typename U, class V>
 void unwrapMat(JavaVM * jvm_, const bool methodOfConv, const int javaID, const int pos)
