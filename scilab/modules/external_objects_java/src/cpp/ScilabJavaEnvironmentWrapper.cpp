@@ -2,6 +2,7 @@
  * PIMS ( http://forge.scilab.org/index.php/p/pims ) - This file is part of PIMS
  * Copyright (C) 2010 - Baozeng DING
  * Copyright (C) 2012 - Scilab Enterprises - Calixte DENIZET
+ * Copyright (C) 2013 - Scilab Enterprises - Sylvestre Ledru
  *
  * This file must be used under the terms of the CeCILL.
  * This source file is licensed as described in the file COPYING, which

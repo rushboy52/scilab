@@ -101,16 +101,12 @@ void ScilabJavaEnvironment::Initialize()
     {
         isInit = true;
         // No need to init the Java VM. Scilab is already using it
-        // TODO: 1 or 0... 1 is to enable to register signal handlers
-        //        Py_InitializeEx(0);
-        //        initNumpy();
     }
 }
 
 void ScilabJavaEnvironment::Finalize()
 {
     // Scilab cannot kill the Java VM. It would probably crash the application
-    //    Py_Finalize();
 }
 
 /*
@@ -1078,33 +1074,11 @@ std::string ScilabJavaEnvironment::getclassname(int id)
     writeLog("getclassname", "Get the class name of object with id %d.", id);
     JavaVM *vm = getScilabJavaVM();
     return std::string(ScilabJavaObject::getClassName(vm, id));
-
-    /*
-        PyObject * obj = scope.getObject(id);
-        if (!obj)
-        {
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid object with id %d"), id);
-        }
-
-        PyObject * __name__ = PyObject_GetAttrString(obj, "__name__");
-        if (!__name__)
-        {
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Cannot get the name of the object."));
-        }
-
-        char * name = PyString_AsString(__name__);
-        std::string str = std::string(name);
-        Py_DECREF(__name__);
-
-        return str;
-    */
-    return 0;
 }
 
 VariableType ScilabJavaEnvironment::isunwrappable(int id)
 {
     writeLog("isunwrappable", "Test if the object with id %d is unwrappable.", id);
-
     return wrapper.isunwrappable(id);
 }
 
