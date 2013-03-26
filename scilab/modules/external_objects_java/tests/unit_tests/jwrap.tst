@@ -6,5 +6,11 @@
 // =============================================================================
 
 
-myString=jwrap("foo")
+myString=jwrap("foo");
 assert_checkequal(jgetclassname(myString),"java.lang.String");
+
+a=jwrap(2);
+assert_checkequal(typeof(a),"_EObj");
+assert_checkequal(jgetclassname(a),"double");
+b=junwrap(a);
+assert_checkequal(typeof(b),"constant");

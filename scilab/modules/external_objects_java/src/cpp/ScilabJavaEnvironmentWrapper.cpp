@@ -24,173 +24,9 @@ namespace org_scilab_modules_external_objects_java
 
 VariableType ScilabJavaEnvironmentWrapper::isunwrappable(int id) const
 {
-    /*    PyObject * obj = scope.getObject(id);
-
-        if (!PyList_Check(obj))
-        {
-            // This is not a list
-            // So this is a single element or a Numpy array
-            if (PyFloat_Check(obj))
-            {
-                return SingleDouble;
-            }
-            else if (PyComplex_Check(obj))
-            {
-                return SingleComplex;
-            }
-            else if (PyBool_Check(obj))
-            {
-                return SingleBoolean;
-            }
-            else if (PyInt_Check(obj))
-            {
-                return SingleInt;
-            }
-            else if (PyString_Check(obj))
-            {
-                return SingleString;
-            }
-            else if (PyArray_Check(obj))
-            {
-                PyArrayObject * arr = (PyArrayObject *)obj;
-                int ndim = PyArray_NDIM(arr);
-                if (ndim > 2)
-                {
-                    // TODO: must handle hypermatrices
-                    return Nothing;
-                }
-
-                int type = PyArray_TYPE(arr);
-                switch (type)
-                {
-                    case PyArray_DOUBLE:
-                        return ndim == 1 ? RowDouble : MatDouble;
-                    case PyArray_BYTE:
-                        return ndim == 1 ? RowChar : MatChar;
-                    case PyArray_UBYTE:
-                        return ndim == 1 ? RowUChar : MatUChar;
-                    case PyArray_SHORT:
-                        return ndim == 1 ? RowShort : MatShort;
-                    case PyArray_USHORT:
-                        return ndim == 1 ? RowUShort : MatUShort;
-                    case PyArray_INT:
-                        return ndim == 1 ? RowInt : MatInt;
-                    case PyArray_UINT:
-                        return ndim == 1 ? RowUInt : MatUInt;
-
-    #ifdef __SCILAB_INT64__
-                    case PyArray_LONG:
-                        return ndim == 1 ? RowLong : MatLong;
-                    case PyArray_ULONG:
-                        return ndim == 1 ? RowULong : MatULong;
-    #endif
-
-                    case PyArray_STRING:
-                        return ndim == 1 ? RowString : MatString;
-                    case PyArray_CDOUBLE:
-                        return ndim == 1 ? RowComplex : MatComplex;
-                    default:
-                        return Nothing;
-                }
-            }
-        }
-        else
-        {
-            // This is a list
-            int size = PyList_Size(obj);
-            if (size == 0)
-            {
-                return Nothing;
-            }
-
-            PyObject * first = PyList_GetItem(obj, 0);
-            PyTypeObject * type = PyList_GetItem(obj, 0)->ob_type;
-
-            for (int i = 1; i < size; i++)
-            {
-                if (!PyObject_TypeCheck(PyList_GetItem(obj, i), type))
-                {
-                    return Nothing;
-                }
-            }
-
-            // Here all the elements have the same type
-            if (PyFloat_Check(first))
-            {
-                return RowDouble;
-            }
-            else if (PyComplex_Check(obj))
-            {
-                return RowComplex;
-            }
-            else if (PyBool_Check(first))
-            {
-                return RowBoolean;
-            }
-            else if (PyInt_Check(first))
-            {
-                return RowInt;
-            }
-            else if (PyString_Check(first))
-            {
-                return RowString;
-            }
-            else if (PyList_Check(first))
-            {
-                // We probably have a matrix
-                int cols = PyList_Size(first);
-                if (cols == 0)
-                {
-                    return Nothing;
-                }
-
-                for (int i = 1; i < size; i++)
-                {
-                    if (PyList_Size(PyList_GetItem(obj, i)) != cols)
-                    {
-                        return Nothing;
-                    }
-                }
-
-                first = PyList_GetItem(first, 0);
-                type = first->ob_type;
-                for (int i = 0; i < size; i++)
-                {
-                    PyObject * list = PyList_GetItem(obj, i);
-                    for (int j = 0; j < cols; j++)
-                    {
-                        if (!PyObject_TypeCheck(PyList_GetItem(list, j), type))
-                        {
-                            return Nothing;
-                        }
-                    }
-                }
-
-                // Here all the elements have thje same type
-                if (PyFloat_Check(first))
-                {
-                    return MatDouble;
-                }
-                else if (PyComplex_Check(obj))
-                {
-                    return MatComplex;
-                }
-                else if (PyBool_Check(first))
-                {
-                    return MatBoolean;
-                }
-                else if (PyInt_Check(first))
-                {
-                    return MatInt;
-                }
-                else if (PyString_Check(first))
-                {
-                    return MatString;
-                }
-            }
-        }
-    */
-    return Nothing;
+    JavaVM *vm = getScilabJavaVM ();
+    int type = ScilabJavaObject::isUnwrappable(vm, id);
+    return (VariableType)type;
 }
 
 // template <class T>
@@ -419,9 +255,8 @@ int ScilabJavaEnvironmentWrapper::wrap(float * x, int xSize, int xSizeCol, const
 
 void ScilabJavaEnvironmentWrapper::unwrapdouble(int id, const ScilabDoubleStackAllocator & allocator) const
 {
-    printf("unwrapdouble %d...", id);
     JavaVM *vm = getScilabJavaVM ();
-    double data = ScilabJavaObject::wrapDouble(vm, id);
+    double data = ScilabJavaObject::unwrapDouble(vm, id);
     allocator.allocate(1, 1, &data);
 }
 
@@ -574,9 +409,9 @@ void ScilabJavaEnvironmentWrapper::unwrapmatboolean(int id, const ScilabBooleanS
 
 void ScilabJavaEnvironmentWrapper::unwrapstring(int id, const ScilabStringStackAllocator & allocator) const
 {
-    /*    PyObject * obj = scope.getObject(id);
-        char * data = PyString_AsString(obj);
-        allocator.allocate(1, 1, &data);*/
+    JavaVM *vm = getScilabJavaVM ();
+//    char * data = ScilabJavaObject::wrapString(vm, id);
+//    allocator.allocate(1, 1, &data);
 }
 
 void ScilabJavaEnvironmentWrapper::unwraprowstring(int id, const ScilabStringStackAllocator & allocator) const
