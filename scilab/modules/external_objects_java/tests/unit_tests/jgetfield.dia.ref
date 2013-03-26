@@ -4,11 +4,5 @@
 //
 //  This file is distributed under the same license as the Scilab package.
 // ===================================================================
-
-
 s = "Hello World !";
-foo=jwrap(s);
-r = jgetmethods(foo);
-
-assert_checktrue(find(r=="toString") <> []);
-assert_checktrue(size(r,"*") > 30); // Currently 42
+r = jgetfield(jwrap(s), "CASE_INSENSITIVE_ORDER");

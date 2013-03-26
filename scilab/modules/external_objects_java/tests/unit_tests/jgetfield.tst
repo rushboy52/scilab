@@ -5,8 +5,6 @@
 //  This file is distributed under the same license as the Scilab package.
 // ===================================================================
 
-// <-- CLI SHELL MODE -->
-
 s = "Hello World !";
 r = jgetfield(jwrap(s), "CASE_INSENSITIVE_ORDER");
 

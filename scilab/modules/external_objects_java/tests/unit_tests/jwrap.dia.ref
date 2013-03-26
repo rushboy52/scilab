@@ -4,7 +4,8 @@
 //
 //  This file is distributed under the same license as the Scilab package.
 // =============================================================================
-
-
 myString=jwrap("foo")
+ myString  =
+ 
+foo
 assert_checkequal(jgetclassname(myString),"java.lang.String");
