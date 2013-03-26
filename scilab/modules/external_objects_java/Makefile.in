@@ -173,7 +173,8 @@ am__objects_3 =  \
 	libsciexternal_objects_java_la-sci_jcompile.lo \
 	libsciexternal_objects_java_la-sci_jnewInstance.lo \
 	libsciexternal_objects_java_la-sci_jremove.lo \
-	libsciexternal_objects_java_la-sci_jexists.lo
+	libsciexternal_objects_java_la-sci_jexists.lo \
+	libsciexternal_objects_java_la-sci_junwrap.lo
 am_libsciexternal_objects_java_la_OBJECTS = $(am__objects_3) \
 	$(am__objects_1)
 libsciexternal_objects_java_la_OBJECTS =  \
@@ -588,7 +589,8 @@ sci_gateway/cpp/sci_jgetfield.cpp \
 sci_gateway/cpp/sci_jcompile.cpp \
 sci_gateway/cpp/sci_jnewInstance.cpp \
 sci_gateway/cpp/sci_jremove.cpp \
-sci_gateway/cpp/sci_jexists.cpp
+sci_gateway/cpp/sci_jexists.cpp \
+sci_gateway/cpp/sci_junwrap.cpp
 
 GIWS_WRAPPERS = src/jni/ScilabObjects.giws.xml
 @GIWS_TRUE@BUILT_SOURCES = giws
@@ -745,6 +747,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsciexternal_objects_java_la-sci_jimport.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsciexternal_objects_java_la-sci_jnewInstance.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsciexternal_objects_java_la-sci_jremove.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsciexternal_objects_java_la-sci_junwrap.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libsciexternal_objects_java_la-sci_jwrap.Plo@am__quote@
 
 .c.o:
@@ -928,6 +931,13 @@ libsciexternal_objects_java_la-sci_jexists.lo: sci_gateway/cpp/sci_jexists.cpp
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sci_gateway/cpp/sci_jexists.cpp' object='libsciexternal_objects_java_la-sci_jexists.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsciexternal_objects_java_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsciexternal_objects_java_la-sci_jexists.lo `test -f 'sci_gateway/cpp/sci_jexists.cpp' || echo '$(srcdir)/'`sci_gateway/cpp/sci_jexists.cpp
+
+libsciexternal_objects_java_la-sci_junwrap.lo: sci_gateway/cpp/sci_junwrap.cpp
+@am__fastdepCXX_TRUE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsciexternal_objects_java_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -MT libsciexternal_objects_java_la-sci_junwrap.lo -MD -MP -MF $(DEPDIR)/libsciexternal_objects_java_la-sci_junwrap.Tpo -c -o libsciexternal_objects_java_la-sci_junwrap.lo `test -f 'sci_gateway/cpp/sci_junwrap.cpp' || echo '$(srcdir)/'`sci_gateway/cpp/sci_junwrap.cpp
+@am__fastdepCXX_TRUE@	$(am__mv) $(DEPDIR)/libsciexternal_objects_java_la-sci_junwrap.Tpo $(DEPDIR)/libsciexternal_objects_java_la-sci_junwrap.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	source='sci_gateway/cpp/sci_junwrap.cpp' object='libsciexternal_objects_java_la-sci_junwrap.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(LIBTOOL)  --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libsciexternal_objects_java_la_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS) -c -o libsciexternal_objects_java_la-sci_junwrap.lo `test -f 'sci_gateway/cpp/sci_junwrap.cpp' || echo '$(srcdir)/'`sci_gateway/cpp/sci_junwrap.cpp
 
 mostlyclean-libtool:
 	-rm -f *.lo
