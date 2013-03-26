@@ -203,7 +203,7 @@ VariableType ScilabJavaEnvironmentWrapper::isunwrappable(int id) const
 int ScilabJavaEnvironmentWrapper::wrap(double * x, const bool isRef) const
 {
     JavaVM *vm = getScilabJavaVM ();
-    return ScilabJavaObject::wrapDouble(vm, x, isRef);
+    return ScilabJavaObject::wrapDouble(vm, *x);
 }
 
 int ScilabJavaEnvironmentWrapper::wrap(double * x, int xSize, const bool isRef) const
@@ -380,14 +380,8 @@ int ScilabJavaEnvironmentWrapper::wrap(char ** x, int xSize, int xSizeCol, const
 
 int ScilabJavaEnvironmentWrapper::wrapBool(int * x, const bool isRef) const
 {
-    /*    if (helper.getWrapSingleWithNumpy())
-        {
-            return wrapData<int, bool, npy_bool>(x, 1, isRef);
-        }
-        else
-        {
-            return wrapData<int, bool>(x, isRef);
-            }*/
+    JavaVM *vm = getScilabJavaVM ();
+//    return ScilabJavaObject::wrapBool(vm, *x);
 }
 
 int ScilabJavaEnvironmentWrapper::wrapBool(int * x, int xSize, const bool isRef) const
