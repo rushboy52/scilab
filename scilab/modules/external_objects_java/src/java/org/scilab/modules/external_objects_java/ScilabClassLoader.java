@@ -62,7 +62,7 @@ public class ScilabClassLoader {
                     ScilabJavaClass sjc = (ScilabJavaClass) ScilabJavaObject.arraySJO[id];
                     URL url = sjc.getURL();
                     if (url == null) {
-                        System.err.println("WARN: The class " + name + " could not be reloaded");
+                        System.err.println("Warning: The class " + name + " could not be reloaded");
                         ScilabJavaObject clone = ScilabJavaObject.arraySJO[id].clone();
                         retId = clone.id;
                     } else {
