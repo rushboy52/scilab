@@ -236,6 +236,11 @@ private:
 
     void getMethodResult(JavaVM * jvm_, const char * const methodName, int id, const ScilabStringStackAllocator & allocator);
 
+    // template <typename T, typename U, class V> void unwrapMat(JavaVM * jvm_, const bool methodOfConv, const int javaID, const ScilabStringStackAllocator & allocator);
+    // template <typename T, typename U, class V> void unwrapRow(JavaVM * jvm_, const bool methodOfConv, const int javaID, const ScilabStringStackAllocator & allocator);
+    // template <typename T, typename U, class V> void unwrapSingle(JavaVM * jvm_, const bool methodOfConv, const int javaID, const ScilabStringStackAllocator & allocator);
+
+
     inline void getAccessibleFields(int id, const ScilabStringStackAllocator & allocator, const bool isField)
     {
 

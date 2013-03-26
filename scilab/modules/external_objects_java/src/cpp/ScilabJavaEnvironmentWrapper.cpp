@@ -241,7 +241,8 @@ int ScilabJavaEnvironmentWrapper::wrap(double * re, double * im, int xSize, int 
 
 int ScilabJavaEnvironmentWrapper::wrap(char * x, const bool isRef) const
 {
-    //    return wrapData<char>(x, isRef);
+    JavaVM *vm = getScilabJavaVM ();
+    return ScilabJavaObject::wrapChar(vm, *x);
 }
 
 int ScilabJavaEnvironmentWrapper::wrap(char * x, int xSize, const bool isRef) const
@@ -271,7 +272,8 @@ int ScilabJavaEnvironmentWrapper::wrap(unsigned char * x, int xSize, int xSizeCo
 
 int ScilabJavaEnvironmentWrapper::wrap(short * x, const bool isRef) const
 {
-    //    return wrapData<short>(x, isRef);
+    JavaVM *vm = getScilabJavaVM ();
+    return ScilabJavaObject::wrapShort(vm, *x);
 }
 
 int ScilabJavaEnvironmentWrapper::wrap(short * x, int xSize, const bool isRef) const
@@ -286,7 +288,8 @@ int ScilabJavaEnvironmentWrapper::wrap(short * x, int xSize, int xSizeCol, const
 
 int ScilabJavaEnvironmentWrapper::wrap(unsigned short * x, const bool isRef) const
 {
-    //    return wrapData<unsigned short>(x, isRef);
+    JavaVM *vm = getScilabJavaVM ();
+    return ScilabJavaObject::wrapUShort(vm, *x);
 }
 
 int ScilabJavaEnvironmentWrapper::wrap(unsigned short * x, int xSize, const bool isRef) const
@@ -301,7 +304,8 @@ int ScilabJavaEnvironmentWrapper::wrap(unsigned short * x, int xSize, int xSizeC
 
 int ScilabJavaEnvironmentWrapper::wrap(int * x, const bool isRef) const
 {
-    //    return wrapData<int>(x, isRef);
+    JavaVM *vm = getScilabJavaVM ();
+    return ScilabJavaObject::wrapInt(vm, *x);
 }
 
 int ScilabJavaEnvironmentWrapper::wrap(int * x, int xSize, const bool isRef) const
@@ -316,7 +320,8 @@ int ScilabJavaEnvironmentWrapper::wrap(int * x, int xSize, int xSizeCol, const b
 
 int ScilabJavaEnvironmentWrapper::wrap(unsigned int * x, const bool isRef) const
 {
-    //    return wrapData<unsigned int>(x, isRef);
+    JavaVM *vm = getScilabJavaVM ();
+    return ScilabJavaObject::wrapUInt(vm, *x);
 }
 
 int ScilabJavaEnvironmentWrapper::wrap(unsigned int * x, int xSize, const bool isRef) const
@@ -333,7 +338,8 @@ int ScilabJavaEnvironmentWrapper::wrap(unsigned int * x, int xSize, int xSizeCol
 
 int ScilabJavaEnvironmentWrapper::wrap(long long * x, const bool isRef) const
 {
-    //    return wrapData<long>(x, isRef);
+    JavaVM *vm = getScilabJavaVM ();
+    return ScilabJavaObject::wrapLong(vm, *x);
 }
 
 int ScilabJavaEnvironmentWrapper::wrap(long long * x, int xSize, const bool isRef) const
@@ -382,7 +388,7 @@ int ScilabJavaEnvironmentWrapper::wrap(char ** x, int xSize, int xSizeCol, const
 int ScilabJavaEnvironmentWrapper::wrapBool(int * x, const bool isRef) const
 {
     JavaVM *vm = getScilabJavaVM ();
-//    return ScilabJavaObject::wrapBool(vm, *x);
+    return ScilabJavaObject::wrapBoolean(vm, *x);
 }
 
 int ScilabJavaEnvironmentWrapper::wrapBool(int * x, int xSize, const bool isRef) const
@@ -397,7 +403,8 @@ int ScilabJavaEnvironmentWrapper::wrapBool(int * x, int xSize, int xSizeCol, con
 
 int ScilabJavaEnvironmentWrapper::wrap(float * x, const bool isRef) const
 {
-    //    return wrapData<float>(x, isRef);
+    JavaVM *vm = getScilabJavaVM ();
+    return ScilabJavaObject::wrapFloat(vm, *x);
 }
 
 int ScilabJavaEnvironmentWrapper::wrap(float * x, int xSize, const bool isRef) const
@@ -412,16 +419,21 @@ int ScilabJavaEnvironmentWrapper::wrap(float * x, int xSize, int xSizeCol, const
 
 void ScilabJavaEnvironmentWrapper::unwrapdouble(int id, const ScilabDoubleStackAllocator & allocator) const
 {
-    //    pyUnwrapSingle<double>(id, allocator);
+    printf("unwrapdouble %d...", id);
+    JavaVM *vm = getScilabJavaVM ();
+    double data = ScilabJavaObject::wrapDouble(vm, id);
+    allocator.allocate(1, 1, &data);
 }
 
 void ScilabJavaEnvironmentWrapper::unwraprowdouble(int id, const ScilabDoubleStackAllocator & allocator) const
 {
+    printf("unwraprowdouble %d...", id);
     //  pyUnwrapRow<double>(id, allocator);
 }
 
 void ScilabJavaEnvironmentWrapper::unwrapmatdouble(int id, const ScilabDoubleStackAllocator & allocator) const
 {
+    printf("unwrapmatdouble %d...", id);
     //    pyUnwrapMat<double>(id, allocator);
 }
 

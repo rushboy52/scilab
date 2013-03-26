@@ -607,91 +607,10 @@ int * ScilabJavaEnvironment::invoke(int id, const char * methodName, int * args,
     }
 
     JavaVM *vm = getScilabJavaVM();
-    int ret = ScilabJavaObject::invoke(vm, id, methodName, args, argsSize);
-    return 0;
-    /*
-        if (*methodName == '\0')
-        {
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid method name"));
-        }
-
-        if (!helper.getShowPrivate() && *methodName == '_')
-        {
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Private method: %s"), methodName);
-        }
-
-            PyObject * obj = scope.getObject(id);
-            if (!obj)
-            {
-                throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid object with id %d"), id);
-            }
-
-            if (!PyObject_HasAttrString(obj, methodName))
-            {
-                throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid method name: %s"), methodName);
-            }
-
-            PyObject * method = PyObject_GetAttrString(obj, methodName);
-            if (!method)
-            {
-                throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid method name: %s"), methodName);
-            }
-
-            if (!PyCallable_Check(method))
-            {
-                Py_DECREF(method);
-                throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid method name: %s"), methodName);
-            }
-
-            PyObject * pArgs = PyTuple_New(argsSize);
-            for (int i = 0; i < argsSize; i++)
-            {
-                PyObject * obj = scope.getObject(args[i]);
-                if (!obj)
-                {
-                    Py_DECREF(pArgs);
-                    Py_DECREF(method);
-                    throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid object with id %d"), id);
-                }
-                Py_INCREF(obj);
-                PyTuple_SetItem(pArgs, i, obj);
-            }
-
-            PyObject * result = PyObject_Call(method, pArgs, 0);
-            Py_DECREF(pArgs);
-            Py_DECREF(method);
-
-            if (!result)
-            {
-                if (PyErr_Occurred())
-                {
-                    PyObject * type, * value, * traceback;
-                    PyErr_Fetch(&type, &value, &traceback);
-                    PyErr_NormalizeException(&type, &value, &traceback);
-                    PyErr_Clear();
-
-                    throw ScilabJavaException(__LINE__, __FILE__, type, value, traceback, gettext("Unable to invoke the method: %s"), methodName);
-                }
-                throw ScilabJavaException(__LINE__, __FILE__, gettext("Unable to invoke the method: %s"), methodName);
-            }
-
-            int * ret = new int[2];
-            *ret = 1;
-
-            if (result == Py_None)
-            {
-                ret[1] = VOID_OBJECT;
-                writeLog("invoke", "The method returned void.");
-
-                return ret;
-            }
-
-            ret[1] = scope.addObject(result);
-            writeLog("invoke", "returned id %d.", ret[1]);
-
-            return ret;
-        */
-    return 0;
+    int * invokedId = new int[2];
+    invokedId[0]= 1 ; //1 object returned
+    invokedId[1] = ScilabJavaObject::invoke(vm, id, methodName, args, argsSize);
+    return invokedId;
 }
 
 void ScilabJavaEnvironment::setfield(int id, const char * fieldName, int idarg)
@@ -1099,36 +1018,14 @@ int ScilabJavaEnvironment::compilecode(char * className, char ** code, int size)
 
 void ScilabJavaEnvironment::enabletrace(const char * filename)
 {
-    if (!traceEnabled)
-    {
-        file = new std::ofstream(filename, std::ios::out | std::ios::trunc);
-        if (!file || file->fail())
-        {
-            if (file)
-            {
-                file->close();
-                delete file;
-            }
-
-            throw ScilabJavaException(__LINE__, __FILE__, gettext("Cannot open the given file %s."), filename);
-        }
-        traceEnabled = true;
-    }
-    else
-    {
-        throw ScilabJavaException(__LINE__, __FILE__, gettext("Trace already enabled"));
-    }
+    JavaVM *vm = getScilabJavaVM();
+    ScilabJavaObject::enableTrace(vm, filename);
 }
 
-void ScilabJavaEnvironment::disabletrace()
+void ScilabJavaEnvironment::disabletrace(void)
 {
-    if (traceEnabled)
-    {
-        traceEnabled = false;
-        file->close();
-        delete file;
-        file = 0;
-    }
+    JavaVM *vm = getScilabJavaVM();
+    ScilabJavaObject::disableTrace(vm);
 }
 
 void ScilabJavaEnvironment::writeLog(const std::string & fun, const std::string str, ...) const
@@ -1206,4 +1103,166 @@ void ScilabJavaEnvironment::getMethodResult(JavaVM * jvm_, const char * const me
     }
 };
 
+/*
+template <typename T, typename U, class V>
+void unwrapMat(JavaVM * jvm_, const bool methodOfConv, const int javaID, const ScilabStringStackAllocator & allocator)
+{
+    SciErr err;
+    jint lenRow, lenCol;
+    jboolean isCopy = JNI_FALSE;
+    jarray oneDim;
+    JNIEnv * curEnv = NULL;
+    U *addr = NULL;
+
+    jvm_->AttachCurrentThread(reinterpret_cast<void **>(&curEnv), NULL);
+    jclass cls = curEnv->FindClass(SCILABJAVAOBJECT);
+
+    jmethodID id = curEnv->GetStaticMethodID(cls, V::getMatMethodName(), V::getMatMethodSignature()) ;
+    if (id == NULL)
+    {
+        throw GiwsException::JniMethodNotFoundException(curEnv, V::getMatMethodName());
+    }
+
+    jobjectArray res = static_cast<jobjectArray>(curEnv->CallStaticObjectMethod(cls, id, javaID));
+    if (curEnv->ExceptionCheck())
+    {
+        throw GiwsException::JniCallMethodException(curEnv);
+    }
+
+    lenRow = curEnv->GetArrayLength(res);
+    oneDim = reinterpret_cast<jarray>(curEnv->GetObjectArrayElement(res, 0));
+    lenCol = curEnv->GetArrayLength(oneDim);
+    curEnv->DeleteLocalRef(oneDim);
+
+//    allocator.allocate(lenRow, lenCol, addr);
+
+    if (getMethodOfConv())
+    {
+        err = V::allocMatrix(pvApiCtx, pos, lenRow, lenCol, (void**) &addr);
+    }
+    else
+    {
+        err = V::allocMatrix(pvApiCtx, pos, lenCol, lenRow, (void**) &addr);
+    }
+
+    if (err.iErr)
+    {
+        curEnv->DeleteLocalRef(res);
+        throw org_scilab_modules_external_objects_java::NoMoreScilabMemoryException();
+    }
+
+    T *resultsArray;
+    for (int i = 0; i < lenRow; i++)
+    {
+        oneDim = reinterpret_cast<jarray>(curEnv->GetObjectArrayElement(res, i));
+        resultsArray = static_cast<T *>(curEnv->GetPrimitiveArrayCritical(oneDim, &isCopy));
+        if (getMethodOfConv())
+        {
+            for (int j = 0; j < lenCol; j++)
+            {
+                addr[j * lenRow + i] = static_cast<U>(resultsArray[j]);
+            }
+        }
+        else
+        {
+            for (int j = 0; j < lenCol; j++)
+            {
+                addr[i * lenCol + j] = static_cast<U>(resultsArray[j]);
+            }
+        }
+        curEnv->ReleasePrimitiveArrayCritical(oneDim, resultsArray, JNI_ABORT);
+        curEnv->DeleteLocalRef(oneDim);
+    }
+
+    curEnv->DeleteLocalRef(res);
+    if (curEnv->ExceptionCheck())
+    {
+        throw GiwsException::JniCallMethodException(curEnv);
+    }
+}
+
+template <typename T, typename U, class V>
+void unwrapRow(JavaVM * jvm_, const bool methodOfConv, const int javaID, const ScilabStringStackAllocator & allocator)
+{
+    SciErr err;
+    jint lenRow;
+    jboolean isCopy = JNI_FALSE;
+    JNIEnv * curEnv = NULL;
+    U *addr = NULL;
+
+    jvm_->AttachCurrentThread(reinterpret_cast<void **>(&curEnv), NULL);
+    jclass cls = curEnv->FindClass(SCILABJAVAOBJECT);
+
+    jmethodID id = curEnv->GetStaticMethodID(cls, V::getRowMethodName(), V::getRowMethodSignature());
+    if (id == NULL)
+    {
+        throw GiwsException::JniMethodNotFoundException(curEnv, V::getRowMethodName());
+    }
+
+    jobjectArray res = static_cast<jobjectArray>(curEnv->CallStaticObjectMethod(cls, id, javaID));
+    if (curEnv->ExceptionCheck())
+    {
+        curEnv->DeleteLocalRef(res);
+        throw GiwsException::JniCallMethodException(curEnv);
+    }
+
+    lenRow = curEnv->GetArrayLength(res);
+
+    // err = V::allocMatrix(pvApiCtx, pos, 1, lenRow, (void**) &addr);
+
+    // if (err.iErr)
+    // {
+    //     curEnv->DeleteLocalRef(res);
+    //     throw org_scilab_modules_external_objects_java::NoMoreScilabMemoryException();
+    // }
+
+    T *resultsArray = static_cast<T *>(curEnv->GetPrimitiveArrayCritical(res, &isCopy));
+    for (int i = 0; i < lenRow; i++)
+    {
+        addr[i] = static_cast<U>(resultsArray[i]);
+    }
+
+    allocator.allocate(lenRow, lenCol, addr);
+
+    curEnv->ReleasePrimitiveArrayCritical(res, resultsArray, JNI_ABORT);
+    curEnv->DeleteLocalRef(res);
+    if (curEnv->ExceptionCheck())
+    {
+        throw GiwsException::JniCallMethodException(curEnv);
+    }
+}
+
+template <typename T, typename U, class V>
+void unwrapSingle(JavaVM * jvm_, const bool methodOfConv, const int javaID, const ScilabStringStackAllocator & allocator)
+{
+    SciErr err;
+    JNIEnv * curEnv = NULL;
+    U *addr = NULL;
+
+    jvm_->AttachCurrentThread(reinterpret_cast<void **>(&curEnv), NULL);
+    jclass cls = curEnv->FindClass(SCILABJAVAOBJECT);
+
+    jmethodID id = curEnv->GetStaticMethodID(cls, V::getMethodName(), V::getMethodSignature()) ;
+    if (id == NULL)
+    {
+        throw GiwsException::JniMethodNotFoundException(curEnv, V::getMethodName());
+    }
+
+    // err = V::allocMatrix(pvApiCtx, pos, 1, 1, (void**) &addr);
+
+    // if (err.iErr)
+    // {
+    //     throw org_scilab_modules_external_objects_java::NoMoreScilabMemoryException();
+    // }
+
+
+
+    *addr = static_cast<U>(V::getSingleVar(curEnv, cls, id, javaID));
+    allocator.allocate(lenRow, lenCol, addr);
+
+    if (curEnv->ExceptionCheck())
+    {
+        throw GiwsException::JniCallMethodException(curEnv);
+    }
+*/
 }
