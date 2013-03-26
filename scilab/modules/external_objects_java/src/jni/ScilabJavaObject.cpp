@@ -108,14 +108,19 @@ jintinvokejintintjstringjava_lang_StringjintArray_intintID=NULL;
 voidinitScilabJavaObjectID=NULL;
 voidgarbageCollectID=NULL;
 jstringgetRepresentationjintintID=NULL;
+jbooleanisValidJavaObjectjintintID=NULL;
+voidenableTracejstringjava_lang_StringID=NULL;
+voiddisableTraceID=NULL;
 voidsetFieldjintintjstringjava_lang_StringjintintID=NULL;
 jintgetFieldjintintjstringjava_lang_StringID=NULL;
 jintgetFieldTypejintintjstringjava_lang_StringID=NULL;
 jintjavaCastjintintjstringjava_lang_StringID=NULL;
+jintjavaCastjintintjintintID=NULL;
 jstringgetClassNamejintintID=NULL;
 jintgetArrayElementjintintjintArray_intintID=NULL;
 voidsetArrayElementjintintjintArray_intintjintintID=NULL;
 voidremoveScilabJavaObjectjintintID=NULL;
+voidlimitDirectBufferjintintID=NULL;
 jintisUnwrappablejintintID=NULL;
 jintwrapDoublejdoubledoubleID=NULL;
 jintwrapDoublejdoubleArray_doubledoubleID=NULL;
@@ -179,14 +184,19 @@ throw GiwsException::JniObjectCreationException(curEnv, this->className());
 voidinitScilabJavaObjectID=NULL;
 voidgarbageCollectID=NULL;
 jstringgetRepresentationjintintID=NULL;
+jbooleanisValidJavaObjectjintintID=NULL;
+voidenableTracejstringjava_lang_StringID=NULL;
+voiddisableTraceID=NULL;
 voidsetFieldjintintjstringjava_lang_StringjintintID=NULL;
 jintgetFieldjintintjstringjava_lang_StringID=NULL;
 jintgetFieldTypejintintjstringjava_lang_StringID=NULL;
 jintjavaCastjintintjstringjava_lang_StringID=NULL;
+jintjavaCastjintintjintintID=NULL;
 jstringgetClassNamejintintID=NULL;
 jintgetArrayElementjintintjintArray_intintID=NULL;
 voidsetArrayElementjintintjintArray_intintjintintID=NULL;
 voidremoveScilabJavaObjectjintintID=NULL;
+voidlimitDirectBufferjintintID=NULL;
 jintisUnwrappablejintintID=NULL;
 jintwrapDoublejdoubledoubleID=NULL;
 jintwrapDoublejdoubleArray_doubledoubleID=NULL;
@@ -352,6 +362,70 @@ return NULL;
 }
 }
 
+bool ScilabJavaObject::isValidJavaObject (JavaVM * jvm_, int id){
+
+JNIEnv * curEnv = NULL;
+jvm_->AttachCurrentThread(reinterpret_cast<void **>(&curEnv), NULL);
+jclass cls = curEnv->FindClass( className().c_str() );
+
+jmethodID jbooleanisValidJavaObjectjintintID = curEnv->GetStaticMethodID(cls, "isValidJavaObject", "(I)Z" ) ;
+if (jbooleanisValidJavaObjectjintintID == NULL) {
+throw GiwsException::JniMethodNotFoundException(curEnv, "isValidJavaObject");
+}
+
+                        jboolean res =  static_cast<jboolean>( curEnv->CallStaticBooleanMethod(cls, jbooleanisValidJavaObjectjintintID ,id));
+                        curEnv->DeleteLocalRef(cls);
+if (curEnv->ExceptionCheck()) {
+throw GiwsException::JniCallMethodException(curEnv);
+}
+return (res == JNI_TRUE);
+
+}
+
+void ScilabJavaObject::enableTrace (JavaVM * jvm_, char const* filename){
+
+JNIEnv * curEnv = NULL;
+jvm_->AttachCurrentThread(reinterpret_cast<void **>(&curEnv), NULL);
+jclass cls = curEnv->FindClass( className().c_str() );
+
+jmethodID voidenableTracejstringjava_lang_StringID = curEnv->GetStaticMethodID(cls, "enableTrace", "(Ljava/lang/String;)V" ) ;
+if (voidenableTracejstringjava_lang_StringID == NULL) {
+throw GiwsException::JniMethodNotFoundException(curEnv, "enableTrace");
+}
+
+jstring filename_ = curEnv->NewStringUTF( filename );
+if (filename != NULL && filename_ == NULL)
+{
+throw GiwsException::JniBadAllocException(curEnv);
+}
+
+
+                         curEnv->CallStaticVoidMethod(cls, voidenableTracejstringjava_lang_StringID ,filename_);
+                        curEnv->DeleteLocalRef(filename_);
+curEnv->DeleteLocalRef(cls);
+if (curEnv->ExceptionCheck()) {
+throw GiwsException::JniCallMethodException(curEnv);
+}
+}
+
+void ScilabJavaObject::disableTrace (JavaVM * jvm_){
+
+JNIEnv * curEnv = NULL;
+jvm_->AttachCurrentThread(reinterpret_cast<void **>(&curEnv), NULL);
+jclass cls = curEnv->FindClass( className().c_str() );
+
+jmethodID voiddisableTraceID = curEnv->GetStaticMethodID(cls, "disableTrace", "()V" ) ;
+if (voiddisableTraceID == NULL) {
+throw GiwsException::JniMethodNotFoundException(curEnv, "disableTrace");
+}
+
+                         curEnv->CallStaticVoidMethod(cls, voiddisableTraceID );
+                        curEnv->DeleteLocalRef(cls);
+if (curEnv->ExceptionCheck()) {
+throw GiwsException::JniCallMethodException(curEnv);
+}
+}
+
 void ScilabJavaObject::setField (JavaVM * jvm_, int id, char const* fieldName, int idarg){
 
 JNIEnv * curEnv = NULL;
@@ -455,6 +529,26 @@ throw GiwsException::JniBadAllocException(curEnv);
                         jint res =  static_cast<jint>( curEnv->CallStaticIntMethod(cls, jintjavaCastjintintjstringjava_lang_StringID ,id, objName_));
                         curEnv->DeleteLocalRef(objName_);
 curEnv->DeleteLocalRef(cls);
+if (curEnv->ExceptionCheck()) {
+throw GiwsException::JniCallMethodException(curEnv);
+}
+return res;
+
+}
+
+int ScilabJavaObject::javaCast (JavaVM * jvm_, int id, int classId){
+
+JNIEnv * curEnv = NULL;
+jvm_->AttachCurrentThread(reinterpret_cast<void **>(&curEnv), NULL);
+jclass cls = curEnv->FindClass( className().c_str() );
+
+jmethodID jintjavaCastjintintjintintID = curEnv->GetStaticMethodID(cls, "javaCast", "(II)I" ) ;
+if (jintjavaCastjintintjintintID == NULL) {
+throw GiwsException::JniMethodNotFoundException(curEnv, "javaCast");
+}
+
+                        jint res =  static_cast<jint>( curEnv->CallStaticIntMethod(cls, jintjavaCastjintintjintintID ,id, classId));
+                        curEnv->DeleteLocalRef(cls);
 if (curEnv->ExceptionCheck()) {
 throw GiwsException::JniCallMethodException(curEnv);
 }
@@ -569,6 +663,24 @@ throw GiwsException::JniMethodNotFoundException(curEnv, "removeScilabJavaObject"
 }
 
                          curEnv->CallStaticVoidMethod(cls, voidremoveScilabJavaObjectjintintID ,id);
+                        curEnv->DeleteLocalRef(cls);
+if (curEnv->ExceptionCheck()) {
+throw GiwsException::JniCallMethodException(curEnv);
+}
+}
+
+void ScilabJavaObject::limitDirectBuffer (JavaVM * jvm_, int id){
+
+JNIEnv * curEnv = NULL;
+jvm_->AttachCurrentThread(reinterpret_cast<void **>(&curEnv), NULL);
+jclass cls = curEnv->FindClass( className().c_str() );
+
+jmethodID voidlimitDirectBufferjintintID = curEnv->GetStaticMethodID(cls, "limitDirectBuffer", "(I)V" ) ;
+if (voidlimitDirectBufferjintintID == NULL) {
+throw GiwsException::JniMethodNotFoundException(curEnv, "limitDirectBuffer");
+}
+
+                         curEnv->CallStaticVoidMethod(cls, voidlimitDirectBufferjintintID ,id);
                         curEnv->DeleteLocalRef(cls);
 if (curEnv->ExceptionCheck()) {
 throw GiwsException::JniCallMethodException(curEnv);

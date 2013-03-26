@@ -80,14 +80,19 @@ jmethodID jintinvokejintintjstringjava_lang_StringjintArray_intintID; // cache m
 jmethodID voidinitScilabJavaObjectID; // cache method id
 jmethodID voidgarbageCollectID; // cache method id
 jmethodID jstringgetRepresentationjintintID; // cache method id
+jmethodID jbooleanisValidJavaObjectjintintID; // cache method id
+jmethodID voidenableTracejstringjava_lang_StringID; // cache method id
+jmethodID voiddisableTraceID; // cache method id
 jmethodID voidsetFieldjintintjstringjava_lang_StringjintintID; // cache method id
 jmethodID jintgetFieldjintintjstringjava_lang_StringID; // cache method id
 jmethodID jintgetFieldTypejintintjstringjava_lang_StringID; // cache method id
 jmethodID jintjavaCastjintintjstringjava_lang_StringID; // cache method id
+jmethodID jintjavaCastjintintjintintID; // cache method id
 jmethodID jstringgetClassNamejintintID; // cache method id
 jmethodID jintgetArrayElementjintintjintArray_intintID; // cache method id
 jmethodID voidsetArrayElementjintintjintArray_intintjintintID; // cache method id
 jmethodID voidremoveScilabJavaObjectjintintID; // cache method id
+jmethodID voidlimitDirectBufferjintintID; // cache method id
 jmethodID jintisUnwrappablejintintID; // cache method id
 jmethodID jintwrapDoublejdoubledoubleID; // cache method id
 jmethodID jintwrapDoublejdoubleArray_doubledoubleID; // cache method id
@@ -193,6 +198,12 @@ static void garbageCollect(JavaVM * jvm_);
 
 static char* getRepresentation(JavaVM * jvm_, int id);
 
+static bool isValidJavaObject(JavaVM * jvm_, int id);
+
+static void enableTrace(JavaVM * jvm_, char const* filename);
+
+static void disableTrace(JavaVM * jvm_);
+
 static void setField(JavaVM * jvm_, int id, char const* fieldName, int idarg);
 
 static int getField(JavaVM * jvm_, int id, char const* fieldName);
@@ -201,6 +212,8 @@ static int getFieldType(JavaVM * jvm_, int id, char const* fieldName);
 
 static int javaCast(JavaVM * jvm_, int id, char const* objName);
 
+static int javaCast(JavaVM * jvm_, int id, int classId);
+
 static char* getClassName(JavaVM * jvm_, int id);
 
 static int getArrayElement(JavaVM * jvm_, int id, int const* index, int indexSize);
@@ -208,6 +221,8 @@ static int getArrayElement(JavaVM * jvm_, int id, int const* index, int indexSiz
 static void setArrayElement(JavaVM * jvm_, int id, int const* index, int indexSize, int idArg);
 
 static void removeScilabJavaObject(JavaVM * jvm_, int id);
+
+static void limitDirectBuffer(JavaVM * jvm_, int id);
 
 static int isUnwrappable(JavaVM * jvm_, int id);
 
