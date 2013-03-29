@@ -43,4 +43,5 @@
     <PRIMITIVE gatewayId="72" primitiveId="12" primitiveName="junwraprem" />
     <PRIMITIVE gatewayId="72" primitiveId="13" primitiveName="jenableTrace" />
     <PRIMITIVE gatewayId="72" primitiveId="14" primitiveName="jdisableTrace" />
+    <PRIMITIVE gatewayId="72" primitiveId="15" primitiveName="jdeff" />
 </GATEWAY>

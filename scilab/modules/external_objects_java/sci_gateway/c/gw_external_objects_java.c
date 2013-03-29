@@ -32,8 +32,8 @@ static gw_generic_table Tab[] =
     {sci_junwrap, "junwrap"},
     {sci_junwraprem, "junwraprem"},
     {sci_jenableTrace, "jenableTrace"},
-    {sci_jdisableTrace, "jdisableTrace"}
-
+    {sci_jdisableTrace, "jdisableTrace"},
+    {sci_jdisableTrace, "jdeff"}
 };
 
 /*--------------------------------------------------------------------------*/

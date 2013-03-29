@@ -55,7 +55,8 @@ sci_gateway/cpp/sci_jexists.cpp \
 sci_gateway/cpp/sci_junwrap.cpp \
 sci_gateway/cpp/sci_junwraprem.cpp \
 sci_gateway/cpp/sci_jenableTrace.cpp \
-sci_gateway/cpp/sci_jdisableTrace.cpp
+sci_gateway/cpp/sci_jdisableTrace.cpp \
+sci_gateway/cpp/sci_jdeff.cpp
 
 GIWS_WRAPPERS = src/jni/ScilabObjects.giws.xml
 
