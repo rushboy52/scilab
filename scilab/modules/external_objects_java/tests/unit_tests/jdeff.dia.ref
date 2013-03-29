@@ -10,7 +10,6 @@
 //
 // <-- JVM MANDATORY -->
 //
-
 jdeff("java.lang.Double", "parseDouble", "str2number");
 PI = str2number("3.141592653589");
 assert_checkalmostequal(PI,%pi);
