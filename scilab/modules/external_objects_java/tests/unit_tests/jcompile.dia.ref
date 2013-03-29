@@ -10,7 +10,6 @@
 //
 // <-- JVM MANDATORY -->
 //
-
 c = jcompile("Test", ["public class Test {";
        "public int field;";
        "public Test(int n) {";
@@ -18,11 +17,8 @@ c = jcompile("Test", ["public class Test {";
        "}";
        "}";]);
 assert_checkequal(jgetclassname(c),"Test");
-
 t = c.new(128);
 v = jgetfield(t, "field");
-
 // or more easier
 //junwraprem(t.field)
-
 jremove c t v;

@@ -29,7 +29,9 @@ static gw_generic_table Tab[] =
     {sci_jnewInstance, "jnewInstance"},
     {sci_jremove, "jremove"},
     {sci_jexists, "jexists"},
-    {sci_junwrap, "junwrap"}
+    {sci_junwrap, "junwrap"},
+    {sci_junwraprem, "junwraprem"}
+
 };
 
 /*--------------------------------------------------------------------------*/

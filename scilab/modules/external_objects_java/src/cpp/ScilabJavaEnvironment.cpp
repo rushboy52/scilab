@@ -507,13 +507,14 @@ std::string ScilabJavaEnvironment::getrepresentation(int id)
     return std::string(ScilabJavaObject::getRepresentation(vm, id));
 }
 
+/* Used by jexists */
 bool ScilabJavaEnvironment::isvalidobject(int id)
 {
-    /*    bool ret = scope.isValid(id);
-        writeLog("isvalidobject", "Test the validity of object %d which is%s valid.", id, ret ? "" : " not");
 
-        return ret;*/
-    return 0;
+    JavaVM *vm = getScilabJavaVM();
+    int ret = ScilabJavaObject::isValidJavaObject(vm, id);
+    writeLog("isvalidobject", "Test the validity of object %d which is%s valid.", id, ret ? "" : " not");
+    return ret;
 }
 
 int ScilabJavaEnvironment::newinstance(int id, int * args, int argsSize)

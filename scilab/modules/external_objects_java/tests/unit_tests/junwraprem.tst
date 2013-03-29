@@ -11,18 +11,13 @@
 // <-- JVM MANDATORY -->
 //
 
-c = jcompile("Test", ["public class Test {";
-       "public int field;";
-       "public Test(int n) {";
-       "field = n;";
-       "}";
-       "}";]);
-assert_checkequal(jgetclassname(c),"Test");
+jimport java.lang.String;
 
-t = c.new(128);
-v = jgetfield(t, "field");
+s = String.new("Hello JIMS !!");
+s1 = s.toUpperCase();
+s2 = s.toLowerCase();
+[S1 S2] = junwraprem(jwrap(s1), jwrap(s2));
+jremove s
 
-// or more easier
-//junwraprem(t.field)
-
-jremove c t v;
+assert_checkequal(S1,"HELLO JIMS !!");
+assert_checkequal(S2,"hello jims !!");

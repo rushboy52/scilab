@@ -40,4 +40,5 @@
     <PRIMITIVE gatewayId="72" primitiveId="9" primitiveName="jremove" />
     <PRIMITIVE gatewayId="72" primitiveId="10" primitiveName="jexists" />
     <PRIMITIVE gatewayId="72" primitiveId="11" primitiveName="junwrap" />
+    <PRIMITIVE gatewayId="72" primitiveId="12" primitiveName="junwraprem" />
 </GATEWAY>

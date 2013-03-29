@@ -410,8 +410,8 @@ void ScilabJavaEnvironmentWrapper::unwrapmatboolean(int id, const ScilabBooleanS
 void ScilabJavaEnvironmentWrapper::unwrapstring(int id, const ScilabStringStackAllocator & allocator) const
 {
     JavaVM *vm = getScilabJavaVM ();
-//    char * data = ScilabJavaObject::wrapString(vm, id);
-//    allocator.allocate(1, 1, &data);
+    char * data = ScilabJavaObject::unwrapString(vm, id);
+    allocator.allocate(1, 1, &data);
 }
 
 void ScilabJavaEnvironmentWrapper::unwraprowstring(int id, const ScilabStringStackAllocator & allocator) const
