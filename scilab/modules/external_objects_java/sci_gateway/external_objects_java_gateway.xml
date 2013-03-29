@@ -41,4 +41,6 @@
     <PRIMITIVE gatewayId="72" primitiveId="10" primitiveName="jexists" />
     <PRIMITIVE gatewayId="72" primitiveId="11" primitiveName="junwrap" />
     <PRIMITIVE gatewayId="72" primitiveId="12" primitiveName="junwraprem" />
+    <PRIMITIVE gatewayId="72" primitiveId="13" primitiveName="jenableTrace" />
+    <PRIMITIVE gatewayId="72" primitiveId="14" primitiveName="jdisableTrace" />
 </GATEWAY>

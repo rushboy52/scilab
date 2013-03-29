@@ -30,7 +30,9 @@ static gw_generic_table Tab[] =
     {sci_jremove, "jremove"},
     {sci_jexists, "jexists"},
     {sci_junwrap, "junwrap"},
-    {sci_junwraprem, "junwraprem"}
+    {sci_junwraprem, "junwraprem"},
+    {sci_jenableTrace, "jenableTrace"},
+    {sci_jdisableTrace, "jdisableTrace"}
 
 };
 

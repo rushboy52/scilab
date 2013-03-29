@@ -29,6 +29,8 @@ EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int sci_jremove(char *fname, unsigned long f
 EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int sci_jexists(char *fname, unsigned long fname_len);
 EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int sci_junwrap(char *fname, unsigned long fname_len);
 EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int sci_junwraprem(char *fname, unsigned long fname_len);
+EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int sci_jenableTrace(char *fname, unsigned long fname_len);
+EXTERNAL_OBJECTS_JAVA_SCILAB_IMPEXP int sci_jdisableTrace(char *fname, unsigned long fname_len);
 /*--------------------------------------------------------------------------*/
 #endif /* __GW_EXTERNAL_OBJECTS_H__ */
 /*--------------------------------------------------------------------------*/
