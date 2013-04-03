@@ -17,6 +17,7 @@
 #include "ScilabClassLoader.hxx"
 #include "ScilabJavaClass.hxx"
 #include "ScilabJavaObject.hxx"
+#include "ScilabJavaArray.hxx"
 #include "ScilabJavaCompiler.hxx"
 #include "NoMoreScilabMemoryException.hxx"
 
@@ -109,12 +110,6 @@ void ScilabJavaEnvironment::Finalize()
     // Scilab cannot kill the Java VM. It would probably crash the application
 }
 
-/*
-void ScilabJavaEnvironment::initNumpy()
-{
-    import_array();
-}
-*/
 JavaOptionsHelper & ScilabJavaEnvironment::getOptionsHelper()
 {
     return helper;
@@ -448,48 +443,16 @@ void ScilabJavaEnvironment::evalString(const char ** code, int nbLines, ScilabSt
 
 int ScilabJavaEnvironment::createarray(char * className, int * dims, int len)
 {
-    if (traceEnabled)
-    {
-        std::ostringstream os;
-        for (int i = 0; i < len - 1; i++)
-        {
-            os << dims[i] << ", ";
-        }
-        os << dims[len - 1] << std::flush;
-
-        writeLog("createarray", "Create a multi-list with dimensions %s.", os.str().c_str());
-    }
-    /*
-        PyObject * obj = 0;
-        if (len == 0)
-        {
-            obj = PyList_New(0);
-            return scope.addObject(obj);
-        }
-
-        for (int i = 0; i < len; i++)
-        {
-            if (dims[i] < 0)
-            {
-                throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid dimension in list creation"));
-            }
-        }
-
-        obj = createMultiList(dims, len);
-        int ret = scope.addObject(obj);
-
-        writeLog("createarray", "returned id %d.", ret);
-
-        return ret;
-    */
-    return 0;
+    writeLog("createarray", "Create array %s of size (%d, %d).", className, dims, len);
+    JavaVM *vm = getScilabJavaVM();
+    return ScilabJavaArray::newInstance(vm, className, dims, len);
 }
 
 int ScilabJavaEnvironment::loadclass(char * className, char * currentSciPath, bool isNamedVarCreated, bool allowReload)
 {
     writeLog("loadclass", "Load the module %s and allowReload is set to %s", className, allowReload ? "true" : "false");
     JavaVM *vm = getScilabJavaVM();
-    return ScilabClassLoader::loadJavaClass(vm, className, TRUE);
+    return ScilabClassLoader::loadJavaClass(vm, className, allowReload);
 }
 
 void ScilabJavaEnvironment::getrepresentation(int id, const ScilabStringStackAllocator & allocator)
@@ -521,7 +484,6 @@ int ScilabJavaEnvironment::newinstance(int id, int * args, int argsSize)
 {
     JavaVM *vm = getScilabJavaVM();
     return ScilabJavaClass::newInstance(vm, id, args, argsSize);
-    //    throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid operation: newinstance."));
 }
 
 int ScilabJavaEnvironment::operation(int idA, int idB, const OperatorsType type)
@@ -609,7 +571,7 @@ int * ScilabJavaEnvironment::invoke(int id, const char * methodName, int * args,
 
     JavaVM *vm = getScilabJavaVM();
     int * invokedId = new int[2];
-    invokedId[0]= 1 ; //1 object returned
+    invokedId[0] = 1 ; //1 object returned
     invokedId[1] = ScilabJavaObject::invoke(vm, id, methodName, args, argsSize);
     return invokedId;
 }
@@ -954,12 +916,14 @@ void ScilabJavaEnvironment::setarrayelement(int id, int * index, int length, int
 
 int ScilabJavaEnvironment::cast(int id, char * className)
 {
-    throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid operation"));
+    JavaVM *vm = getScilabJavaVM();
+    return ScilabJavaObject::javaCast(vm, id, className);
 }
 
 int ScilabJavaEnvironment::castwithid(int id, int classId)
 {
-    throw ScilabJavaException(__LINE__, __FILE__, gettext("Invalid operation"));
+    JavaVM *vm = getScilabJavaVM();
+    return ScilabJavaObject::javaCast(vm, id, classId);
 }
 
 void ScilabJavaEnvironment::removeobject(int id)

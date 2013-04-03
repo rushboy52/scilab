@@ -33,7 +33,11 @@ static gw_generic_table Tab[] =
     {sci_junwraprem, "junwraprem"},
     {sci_jenableTrace, "jenableTrace"},
     {sci_jdisableTrace, "jdisableTrace"},
-    {sci_jdeff, "jdeff"}
+    {sci_jdeff, "jdeff"},
+    {sci_jvoid, "jvoid"},
+    {sci_jarray, "jarray"},
+    {sci_jcast, "jcast"},
+    {sci_jallowClassReloading, "jallowClassReloading"}
 };
 
 /*--------------------------------------------------------------------------*/
